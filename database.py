@@ -1,11 +1,15 @@
 
 """
 DATABASE MANAGER - Version Corrigée
-BUG FIX: nb_colonnes ajouté comme paramètre dans import_partie_from_sequence
 """
 
-import mysql.connector
-from mysql.connector import Error
+try:
+    import mysql.connector
+    from mysql.connector import Error
+    MYSQL_AVAILABLE = True
+except ImportError:
+    MYSQL_AVAILABLE = False
+
 import hashlib
 import random
 import json
