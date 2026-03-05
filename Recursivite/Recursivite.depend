@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1683663471 source:/home/sim/Bureau/Recursivite/fonctions.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	"fonctions.h"
+
+1683663402 /home/sim/Bureau/Recursivite/fonctions.h
+	<stdbool.h>
+
+1683663534 source:/home/sim/Bureau/Recursivite/main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+

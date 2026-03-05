@@ -1,0 +1,9 @@
+{
+  "rows": 9,
+  "cols": 9,
+  "first_player": "X",
+  "color_x": "red",
+  "color_o": "yellow",
+  "minimax_depth": 5,
+  "ai_mode": "minimax"
+}

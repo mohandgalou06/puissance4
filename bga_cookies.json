@@ -1,0 +1,96 @@
+[
+  {
+    "domain": ".boardgamearena.com",
+    "httpOnly": false,
+    "name": "registrationState",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "{\"username\":null,\"emailAddress\":null,\"password\":null,\"partnerEvent\":[],\"isPremium\":false}"
+  },
+  {
+    "domain": ".boardgamearena.com",
+    "httpOnly": true,
+    "name": "TournoiEnLignetkt",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "rEZya5Ay7qA7XbiLXOLwKE2ysZR8ao4j1M3cM1uDgpByPKbz8b5RUADD7dF4xAnQ"
+  },
+  {
+    "domain": ".boardgamearena.com",
+    "httpOnly": true,
+    "name": "TournoiEnLigne_sso_user",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "galou_moumouh%243%24galoumoumouh07%40gmail.com"
+  },
+  {
+    "domain": ".boardgamearena.com",
+    "expiry": 1787513558,
+    "httpOnly": false,
+    "name": "didomi_dcs",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "CGcgedtzlauq5DQkHWot220IATf0UIATgBAABEAACAAEAABeCRSeI1cAAGAA..."
+  },
+  {
+    "domain": ".boardgamearena.com",
+    "expiry": 1787513558,
+    "httpOnly": false,
+    "name": "euconsent-v2",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "CQf-ZcAQf-ZcAAHABBENCSFgAIEAAAAAAAAAAAAAAAAA.cCAAAAAAAAAA"
+  },
+  {
+    "domain": ".boardgamearena.com",
+    "httpOnly": true,
+    "name": "TournoiEnLigneidt",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "Y4mkCX666dZLdnJ"
+  },
+  {
+    "domain": ".boardgamearena.com",
+    "expiry": 1803241994,
+    "httpOnly": true,
+    "name": "TournoiEnLigneid",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "SIWL5Ne2sIYk03U"
+  },
+  {
+    "domain": ".boardgamearena.com",
+    "httpOnly": true,
+    "name": "TournoiEnLigne_sso_id",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "aab36800b2597402882c4f93bcffb01d"
+  },
+  {
+    "domain": "boardgamearena.com",
+    "httpOnly": true,
+    "name": "PHPSESSID",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "5d338f82bf2fcd97dc7af39486156b00"
+  },
+  {
+    "domain": ".boardgamearena.com",
+    "expiry": 1803241994,
+    "httpOnly": true,
+    "name": "TournoiEnLignetk",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "66U5uDdNYCiij9eXrl5hdajR95j8qLKyIPN3csGbLefZwvJPYu5s2lZbEcfxFeVG"
+  }
+]
