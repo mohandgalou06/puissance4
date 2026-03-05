@@ -37,8 +37,8 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
 .dot-red{background:var(--red);box-shadow:var(--glow-r)}.dot-yellow{background:var(--yellow);box-shadow:var(--glow-y)}.dot-draw{background:#8899cc;animation:none}
 #game-area{display:flex;gap:24px;align-items:flex-start;padding:10px}
 #board-wrap{position:relative}
-#board{background:var(--board);border-radius:20px;padding:16px;box-shadow:0 0 60px #0d1b4b,0 20px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.07);display:grid;grid-template-columns:repeat(7,1fr);gap:10px;position:relative}
-#col-hint{position:absolute;top:-50px;width:calc(100% - 32px);left:16px;display:grid;grid-template-columns:repeat(7,1fr);gap:10px;pointer-events:none}
+#board{background:var(--board);border-radius:20px;padding:16px;box-shadow:0 0 60px #0d1b4b,0 20px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.07);display:grid;grid-template-columns:repeat(9,1fr);gap:10px;position:relative}
+#col-hint{position:absolute;top:-50px;width:calc(100% - 32px);left:16px;display:grid;grid-template-columns:repeat(9,1fr);gap:10px;pointer-events:none}
 .hint-cell{height:36px;border-radius:50%;opacity:0;transition:opacity .2s}
 .hint-cell.show-red{opacity:.7;background:var(--red);box-shadow:var(--glow-r)}
 .hint-cell.show-yellow{opacity:.7;background:var(--yellow);box-shadow:var(--glow-y)}
@@ -242,7 +242,7 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
 </div>
 
 <script>
-const ROWS=9,COLS=9,EMPTY=0,P1=1,P2=2;
+const ROWS=6,COLS=7,EMPTY=0,P1=1,P2=2;
 let board=[],currentPlayer=P1,gameOver=false,mode='pvp',aiDepth=4;
 let scores={1:0,2:0,draws:0},totalMoves=0,totalGames=0;
 let history=[],moveHistory=[];
@@ -630,3 +630,7 @@ updateNames();init();loadDBStats();
 </script>
 </body>
 </html>
+
+
+
+
