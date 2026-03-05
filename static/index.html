@@ -37,12 +37,12 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
 .dot-red{background:var(--red);box-shadow:var(--glow-r)}.dot-yellow{background:var(--yellow);box-shadow:var(--glow-y)}.dot-draw{background:#8899cc;animation:none}
 #game-area{display:flex;gap:24px;align-items:flex-start;padding:10px}
 #board-wrap{position:relative}
-#board{background:var(--board);border-radius:20px;padding:16px;box-shadow:0 0 60px #0d1b4b,0 20px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.07);display:grid;grid-template-columns:repeat(9,1fr);gap:10px;position:relative}
-#col-hint{position:absolute;top:-50px;width:calc(100% - 32px);left:16px;display:grid;grid-template-columns:repeat(9,1fr);gap:10px;pointer-events:none}
-.hint-cell{height:36px;border-radius:50%;opacity:0;transition:opacity .2s}
+#board{background:var(--board);border-radius:20px;padding:16px;box-shadow:0 0 60px #0d1b4b,0 20px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.07);display:grid;grid-template-columns:repeat(9,1fr);gap:8px;position:relative}
+#col-hint{position:absolute;top:-50px;width:calc(100% - 32px);left:16px;display:grid;grid-template-columns:repeat(9,1fr);gap:8px;pointer-events:none}
+.hint-cell{height:32px;border-radius:50%;opacity:0;transition:opacity .2s}
 .hint-cell.show-red{opacity:.7;background:var(--red);box-shadow:var(--glow-r)}
 .hint-cell.show-yellow{opacity:.7;background:var(--yellow);box-shadow:var(--glow-y)}
-.cell{width:clamp(50px,7vw,72px);height:clamp(50px,7vw,72px);border-radius:50%;background:#060e28;box-shadow:inset 0 4px 8px rgba(0,0,0,.8),inset 0 0 0 1px rgba(255,255,255,.04);position:relative;cursor:pointer;transition:transform .1s}
+.cell{width:clamp(40px,5.5vw,58px);height:clamp(40px,5.5vw,58px);border-radius:50%;background:#060e28;box-shadow:inset 0 4px 8px rgba(0,0,0,.8),inset 0 0 0 1px rgba(255,255,255,.04);position:relative;cursor:pointer;transition:transform .1s}
 .cell:hover{transform:scale(1.04)}
 .piece{position:absolute;inset:4px;border-radius:50%;transform:translateY(-500px);transition:none}
 .piece.land{animation:drop-land .15s ease-out forwards}
@@ -94,7 +94,7 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
 .think-dot:nth-child(2){animation-delay:.2s}.think-dot:nth-child(3){animation-delay:.4s}
 @keyframes think{0%,80%,100%{transform:scale(.6);opacity:.3}40%{transform:scale(1);opacity:1}}
 #ai-think p{color:var(--yellow);font-size:.9rem;letter-spacing:1px}
-#col-nums{display:grid;grid-template-columns:repeat(9,1fr);gap:10px;padding:0 16px;margin-top:6px;text-align:center}
+#col-nums{display:grid;grid-template-columns:repeat(9,1fr);gap:8px;padding:0 16px;margin-top:6px;text-align:center}
 .col-num{font-size:.75rem;color:rgba(136,153,204,.5);cursor:pointer;padding:4px;border-radius:4px;transition:color .2s}
 .col-num:hover{color:var(--sub)}
 #notif{position:fixed;top:20px;right:20px;z-index:500;display:flex;flex-direction:column;gap:8px}
@@ -102,7 +102,6 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
 .notif-item.success{border-color:#00b89466;color:#00b894}
 .notif-item.error{border-color:#ef233c66;color:#ef233c}
 @keyframes notif-in{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-/* Leaderboard tab */
 .tab-content{display:none}.tab-content.active{display:block}
 .tabs{display:flex;gap:4px;margin-bottom:12px;background:rgba(0,0,0,.3);border-radius:10px;padding:4px}
 .tab{flex:1;padding:6px;border:none;background:transparent;color:var(--sub);border-radius:8px;cursor:pointer;font-size:.75rem;font-family:'Exo 2',sans-serif;font-weight:600;transition:all .2s;text-align:center}
@@ -114,7 +113,7 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
 .lb-name{flex:1;color:var(--text)}
 .lb-wins{font-weight:700;color:#00c864}
 @media(max-width:900px){#game-area{flex-direction:column;align-items:center}.side-panel{width:100%;max-width:500px}}
-@media(max-width:500px){.cell{width:44px;height:44px}#board{gap:7px;padding:12px}}
+@media(max-width:500px){.cell{width:36px;height:36px}#board{gap:5px;padding:10px}}
 </style>
 </head>
 <body>
@@ -127,7 +126,6 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
     <p>ÉDITION PRO — GALOU_MOUMOUH</p>
     <div id="db-badge">⚡ MySQL connecté</div>
   </header>
-
   <div id="scoreboard">
     <div class="score-card red active" id="card1">
       <div class="score-name" id="name1">Joueur 1</div>
@@ -141,14 +139,11 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
       <div class="score-label">victoires session</div>
     </div>
   </div>
-
   <div id="status-bar">
     <span class="status-dot dot-red" id="status-dot"></span>
     <span id="status-text">Au tour de Joueur 1</span>
   </div>
-
   <div id="game-area">
-    <!-- Panel gauche -->
     <div class="side-panel">
       <h3>🎮 Mode</h3>
       <div class="mode-tabs">
@@ -167,10 +162,8 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
       <div id="timer">00:00</div>
       <button class="btn btn-primary" onclick="newGame()">🎮 Nouvelle Partie</button>
       <button class="btn btn-secondary" onclick="undoMove()">↩ Annuler Coup</button>
-      <button class="btn btn-green" onclick="saveToMySQL()" id="save-btn">💾 Sauvegarder en BDD</button>
+      <button class="btn btn-green" onclick="saveToMySQL()" id="save-btn">💾 Sauvegarder</button>
     </div>
-
-    <!-- Plateau -->
     <div id="board-wrap">
       <div id="col-hint"></div>
       <div id="board"></div>
@@ -182,15 +175,12 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
       </div>
       <div id="col-nums"></div>
     </div>
-
-    <!-- Panel droit -->
     <div class="side-panel">
       <div class="tabs">
         <div class="tab active" onclick="showTab('stats')">📊 Stats</div>
         <div class="tab" onclick="showTab('history')">📝 Coups</div>
         <div class="tab" onclick="showTab('leaderboard')">🏆 Classement</div>
       </div>
-
       <div id="tab-stats" class="tab-content active">
         <div style="font-size:.82rem;color:var(--sub);display:flex;flex-direction:column;gap:6px">
           <div>Parties BDD: <span id="stat-db" style="color:#00c864;float:right">...</span></div>
@@ -211,11 +201,9 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
             onchange="updateNames()"></div>
         </div>
       </div>
-
       <div id="tab-history" class="tab-content">
         <div id="history-list"><div style="color:var(--sub);font-size:.8rem;text-align:center">Aucun coup joué</div></div>
       </div>
-
       <div id="tab-leaderboard" class="tab-content">
         <div id="leaderboard-list"><div style="color:var(--sub);font-size:.8rem;text-align:center">Chargement...</div></div>
         <button class="btn btn-secondary" style="margin-top:8px;font-size:.75rem" onclick="loadLeaderboard()">🔄 Actualiser</button>
@@ -223,8 +211,6 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
     </div>
   </div>
 </div>
-
-<!-- Win Modal -->
 <div class="modal-bg" id="win-modal">
   <div class="modal">
     <div style="font-size:3rem" id="win-icon">🏆</div>
@@ -240,9 +226,8 @@ header p{color:var(--sub);font-size:.9rem;letter-spacing:2px;margin-top:4px}
     </div>
   </div>
 </div>
-
 <script>
-const ROWS=6,COLS=7,EMPTY=0,P1=1,P2=2;
+const ROWS=9,COLS=9,EMPTY=0,P1=1,P2=2;
 let board=[],currentPlayer=P1,gameOver=false,mode='pvp',aiDepth=4;
 let scores={1:0,2:0,draws:0},totalMoves=0,totalGames=0;
 let history=[],moveHistory=[];
@@ -250,37 +235,29 @@ let timerInterval,timerSeconds=0;
 let soundEnabled=true,hintEnabled=true,aiThinking=false;
 let partieTerminee=false,partieSauvegardee=false;
 
-// ======= NOTIFS =======
 function notif(msg,type='success'){
   const el=document.createElement('div');
   el.className=`notif-item ${type}`;el.textContent=msg;
   document.getElementById('notif').appendChild(el);
   setTimeout(()=>el.remove(),3000);
 }
-
-// ======= DB STATS =======
 async function loadDBStats(){
   try{
-    const r=await fetch('/api/stats/global');
-    const d=await r.json();
+    const r=await fetch('/api/stats/global');const d=await r.json();
     document.getElementById('stat-db').textContent=d.parties||0;
     document.getElementById('stat-db-joueurs').textContent=d.joueurs||0;
     document.getElementById('db-badge').textContent=`⚡ MySQL — ${d.parties} parties`;
-    document.getElementById('db-badge').className='db-badge';
   }catch(e){
     document.getElementById('db-badge').textContent='⚠ MySQL hors ligne';
     document.getElementById('db-badge').className='db-badge offline';
   }
 }
-
 async function loadLeaderboard(){
   document.getElementById('leaderboard-list').innerHTML='<div style="color:var(--sub);font-size:.8rem;text-align:center">Chargement...</div>';
   try{
-    const r=await fetch('/api/stats');
-    const data=await r.json();
+    const r=await fetch('/api/stats');const data=await r.json();
     if(!data.length){document.getElementById('leaderboard-list').innerHTML='<div style="color:var(--sub);font-size:.8rem;text-align:center">Aucun joueur</div>';return;}
-    const medals=['🥇','🥈','🥉'];
-    const ranks=['gold','silver','bronze'];
+    const medals=['🥇','🥈','🥉'];const ranks=['gold','silver','bronze'];
     document.getElementById('leaderboard-list').innerHTML=data.slice(0,10).map((p,i)=>`
       <div class="lb-row">
         <div class="lb-rank ${ranks[i]||''}">${medals[i]||i+1}</div>
@@ -290,8 +267,6 @@ async function loadLeaderboard(){
       </div>`).join('');
   }catch(e){document.getElementById('leaderboard-list').innerHTML='<div style="color:#ef233c;font-size:.8rem">Erreur chargement</div>';}
 }
-
-// ======= SAVE TO MYSQL =======
 async function saveToMySQL(){
   const seq=moveHistory.map(m=>m.col).join('');
   if(!seq){notif('Aucun coup à sauvegarder','error');return;}
@@ -301,21 +276,11 @@ async function saveToMySQL(){
       body:JSON.stringify({sequence:seq,joueur1:getN1(),joueur2:getN2(),mode})});
     const d=await r.json();
     if(d.status==='created'){
-      notif('✅ Partie sauvegardée en MySQL !');
-      partieSauvegardee=true;
-      document.getElementById('win-save-status').textContent='✅ Sauvegardée en base de données';
-      loadDBStats();
-    } else if(d.status==='exists'){
-      notif('Partie déjà en base','error');
-    } else if(d.status==='symetrique'){
-      notif('Version symétrique déjà en base','error');
-    } else {
-      notif('Erreur: '+(d.message||'inconnue'),'error');
-    }
-  }catch(e){notif('Erreur connexion Flask','error');}
+      notif('✅ Partie sauvegardée !');partieSauvegardee=true;
+      document.getElementById('win-save-status').textContent='✅ Sauvegardée';loadDBStats();
+    }else{notif('Erreur: '+(d.message||d.status),'error');}
+  }catch(e){notif('Erreur connexion','error');}
 }
-
-// ======= TABS =======
 function showTab(tab){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -323,8 +288,6 @@ function showTab(tab){
   event.target.classList.add('active');
   if(tab==='leaderboard')loadLeaderboard();
 }
-
-// ======= AUDIO =======
 const AudioCtx=window.AudioContext||window.webkitAudioContext;let actx;
 function getActx(){if(!actx)actx=new AudioCtx();return actx}
 function beep(freq=440,dur=0.08,type='sine',vol=0.2){
@@ -336,7 +299,6 @@ function playDrop(p){beep(p===P1?440:550,0.12,'sine')}
 function playWin(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.2,'sine',.3),i*120));}
 function playDraw(){beep(300,.3,'sawtooth',.15)}
 
-// ======= INIT =======
 function init(){
   board=Array.from({length:ROWS},()=>Array(COLS).fill(EMPTY));
   currentPlayer=P1;gameOver=false;aiThinking=false;partieTerminee=false;partieSauvegardee=false;
@@ -350,7 +312,6 @@ function init(){
 function newGame(){init()}
 function closeModal(){document.getElementById('win-modal').classList.remove('show')}
 
-// ======= RENDER =======
 function renderBoard(){
   const b=document.getElementById('board');
   b.innerHTML='';
@@ -376,7 +337,7 @@ function renderBoard(){
   }
   setTimeout(()=>{
     const cells=b.querySelectorAll('.cell');if(!cells.length)return;
-    const cs=cells[0].offsetWidth,gap=10,pad=16;
+    const cs=cells[0].offsetWidth,gap=8,pad=16;
     for(let c=0;c<COLS;c++){
       const zone=document.createElement('div');zone.className='col-zone';
       zone.style.cssText=`left:${pad+c*(cs+gap)}px;width:${cs}px`;
@@ -386,21 +347,18 @@ function renderBoard(){
     }
   },50);
 }
-
 function showHint(col){
   if(gameOver||aiThinking)return;hideHints();
   const h=document.getElementById(`hint-${col}`);
   if(h)h.className=`hint-cell ${currentPlayer===P1?'show-red':'show-yellow'}`;
 }
 function hideHints(){for(let c=0;c<COLS;c++){const h=document.getElementById(`hint-${c}`);if(h)h.className='hint-cell';}}
-
 function handleClick(col){
   if(gameOver||aiThinking)return;
   if(mode==='iavsia')return;
   if(mode==='pvia'&&currentPlayer===P2)return;
   dropPiece(col);
 }
-
 function dropPiece(col){
   const row=getLowestRow(col);if(row===-1)return false;
   const oldBoard=board.map(r=>[...r]);board[row][col]=currentPlayer;
@@ -418,12 +376,11 @@ function dropPiece(col){
   });
   return true;
 }
-
 function animateDrop(row,col,player,cb){
   playDrop(player);
   const cell=document.getElementById(`cell-${row}-${col}`);
   const piece=document.createElement('div');piece.className='piece '+(player===P1?'red':'yellow');
-  const totalRows=row+1,cellH=cell.offsetHeight+10;
+  const totalRows=row+1,cellH=cell.offsetHeight+8;
   piece.style.transform=`translateY(-${totalRows*cellH+50}px)`;cell.appendChild(piece);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     piece.style.transition=`transform ${Math.max(0.15,0.05*totalRows+0.1)}s cubic-bezier(.25,.46,.45,.94)`;
@@ -434,14 +391,12 @@ function animateDrop(row,col,player,cb){
     },{once:true});
   }));
 }
-
 function highlightWin(cells){
   cells.forEach(([r,c])=>{const cell=document.getElementById(`cell-${r}-${c}`);
     if(cell){const p=cell.querySelector('.piece');if(p)p.classList.add('winning');}});
 }
 function getLowestRow(col){for(let r=ROWS-1;r>=0;r--)if(board[r][col]===EMPTY)return r;return -1;}
 function isBoardFull(){return board[0].every(c=>c!==EMPTY)}
-
 function checkWin(row,col,player){
   const dirs=[[0,1],[1,0],[1,1],[1,-1]];
   for(const[dr,dc]of dirs){
@@ -451,7 +406,6 @@ function checkWin(row,col,player){
     if(cells.length>=4)return cells;
   }return null;
 }
-
 function handleWin(player){
   gameOver=true;aiThinking=false;partieTerminee=true;clearTimer();
   scores[player]++;totalGames++;updateScoreDisplay();updateStats();playWin();
@@ -465,10 +419,8 @@ function handleWin(player){
   document.getElementById('win-sub').textContent=`${name} remporte cette manche !`;
   setTimeout(()=>document.getElementById('win-modal').classList.add('show'),800);
   updateStatus(`🏆 ${name} gagne !`,player);
-  // Auto-save
   setTimeout(saveToMySQL,1200);
 }
-
 function handleDraw(){
   gameOver=true;partieTerminee=true;clearTimer();
   scores.draws++;totalGames++;updateStats();playDraw();
@@ -482,7 +434,6 @@ function handleDraw(){
   updateStatus('🤝 Match nul !');
   setTimeout(saveToMySQL,800);
 }
-
 function updateStatus(msg,player){
   const dot=document.getElementById('status-dot'),txt=document.getElementById('status-text');
   document.getElementById('card1').classList.remove('active');document.getElementById('card2').classList.remove('active');
@@ -531,7 +482,6 @@ function getN1(){return document.getElementById('inp-name1').value||'Joueur 1'}
 function getN2(){if(mode==='pvia'||mode==='iavsia')return 'IA';return document.getElementById('inp-name2').value||'Joueur 2';}
 function updateNames(){document.getElementById('name1').textContent=getN1();document.getElementById('name2').textContent=getN2();updateStatus();}
 
-// ======= IA =======
 function doAiTurn(){
   if(gameOver||!['pvia','iavsia'].includes(mode))return;
   aiThinking=true;document.getElementById('ai-think').classList.add('show');
@@ -542,7 +492,8 @@ function doAiTurn(){
 }
 function getBestMove(b,player,depth){
   let bestScore=player===P2?-Infinity:Infinity,bestCol=getValidCols(b)[0];
-  for(const col of getValidCols(b).sort((a,b)=>Math.abs(a-3)-Math.abs(b-3))){
+  const center=Math.floor(COLS/2);
+  for(const col of getValidCols(b).sort((a,b)=>Math.abs(a-center)-Math.abs(b-center))){
     const row=getLowestRowB(b,col);b[row][col]=player;
     const score=minimax(b,depth-1,player===P1,player,-Infinity,Infinity);
     b[row][col]=EMPTY;
@@ -555,7 +506,8 @@ function minimax(b,depth,maximizing,aiPlayer,alpha,beta){
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)
     if(b[r][c]!==EMPTY&&isWinnerOnBoard(b,r,c,b[r][c]))return b[r][c]===aiPlayer?100000+depth:-100000-depth;
   if(depth===0||!getValidCols(b).length)return evaluateBoard(b,aiPlayer);
-  const cols=getValidCols(b).sort((a,b)=>Math.abs(a-3)-Math.abs(b-3));
+  const center=Math.floor(COLS/2);
+  const cols=getValidCols(b).sort((a,b)=>Math.abs(a-center)-Math.abs(b-center));
   if(maximizing){
     let best=-Infinity;
     for(const col of cols){const row=getLowestRowB(b,col);b[row][col]=aiPlayer;
@@ -570,7 +522,8 @@ function minimax(b,depth,maximizing,aiPlayer,alpha,beta){
 }
 function evaluateBoard(b,player){
   let score=0;const opp=player===P1?P2:P1;
-  for(let r=0;r<ROWS;r++)if(b[r][3]===player)score+=6;
+  const center=Math.floor(COLS/2);
+  for(let r=0;r<ROWS;r++)if(b[r][center]===player)score+=6;
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)
     for(const[dr,dc]of[[0,1],[1,0],[1,1],[1,-1]]){
       const w=[];for(let i=0;i<4;i++){const nr=r+dr*i,nc=c+dc*i;
@@ -590,7 +543,6 @@ function isWinnerOnBoard(b,row,col,player){
 function getValidCols(b){return Array.from({length:COLS},(_,i)=>i).filter(c=>b[0][c]===EMPTY)}
 function getLowestRowB(b,col){for(let r=ROWS-1;r>=0;r--)if(b[r][col]===EMPTY)return r;return -1;}
 
-// ======= CONFETTI =======
 const canvas=document.getElementById('canvas');const ctx=canvas.getContext('2d');
 canvas.width=window.innerWidth;canvas.height=window.innerHeight;
 window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
@@ -612,8 +564,6 @@ function animateParticles(){
   if(particles.length)animFrame=requestAnimationFrame(animateParticles);
   else ctx.clearRect(0,0,canvas.width,canvas.height);
 }
-
-// ======= STARS =======
 const sc=document.getElementById('stars');sc.width=window.innerWidth;sc.height=window.innerHeight;
 const sctx=sc.getContext('2d');
 const stars=Array.from({length:80},()=>({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,r:Math.random()*1.5+.3,a:Math.random(),da:(Math.random()-.5)*.01}));
@@ -624,13 +574,7 @@ function animStars(){
   requestAnimationFrame(animStars);
 }
 animStars();
-
-// ======= START =======
 updateNames();init();loadDBStats();
 </script>
 </body>
 </html>
-
-
-
-
