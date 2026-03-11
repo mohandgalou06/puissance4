@@ -385,7 +385,7 @@
                 boardDiv.setAttribute('data-hover', currentHoverColor);
                 
                 if (nextColor === iaColor) {
-                    document.getElementById('status').innerText = "Séquence importée : L'IA Terminator prend le relais...";
+                    document.getElementById('status').innerText = "Séquence importée : Terminator prend le relais...";
                     setBoardNeon(iaColor);
                     jeuTermine = true; 
                     await declencherIA();
@@ -424,7 +424,7 @@
                 setBoardNeon('rouge'); 
             } else {
                 if (starter === 'ia') {
-                    document.getElementById('status').innerText = "L'IA Terminator joue son premier coup...";
+                    document.getElementById('status').innerText = "Terminator joue son premier coup...";
                     currentHoverColor = 'jaune'; 
                     setBoardNeon('rouge'); 
                 } else {
@@ -533,7 +533,7 @@
                 return;
             }
 
-            document.getElementById('status').innerText = "L'IA Terminator analyse...";
+            document.getElementById('status').innerText = "Terminator analyse...";
             setBoardNeon(document.getElementById('select-starter').value === 'ia' ? 'rouge' : 'jaune');
             await declencherIA();
         }
