@@ -1,0 +1,493 @@
+2026-03-03 22:20:13,958 - INFO - package: mysql.connector.plugins
+2026-03-03 22:20:13,958 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:20:13,959 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:20:20,023 - INFO - ====== WebDriver manager ======
+2026-03-03 22:20:23,112 - INFO - Get LATEST geckodriver version for 146.0 firefox
+2026-03-03 22:20:23,897 - INFO - Get LATEST geckodriver version for 146.0 firefox
+2026-03-03 22:20:24,864 - INFO - There is no [win64] geckodriver "v0.36.0" for browser firefox "146.0" in cache
+2026-03-03 22:20:24,864 - INFO - Get LATEST geckodriver version for 146.0 firefox
+2026-03-03 22:20:25,864 - INFO - Getting latest mozilla release info for v0.36.0
+2026-03-03 22:20:26,569 - INFO - About to download new driver from https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-win64.zip
+2026-03-03 22:20:28,127 - INFO - Driver downloading response is 200
+2026-03-03 22:20:28,925 - INFO - Get LATEST geckodriver version for 146.0 firefox
+2026-03-03 22:20:29,620 - INFO - Driver has been saved in cache [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0]
+2026-03-03 22:20:29,622 - INFO - Lancement de Firefox...
+2026-03-03 22:20:34,919 - INFO - ERREUR: Message: Process unexpectedly closed with status 0
+
+2026-03-03 22:20:48,442 - INFO - ====== WebDriver manager ======
+2026-03-03 22:20:50,558 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:20:51,349 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:20:51,921 - INFO - There is no [win64] geckodriver "v0.36.0" for browser firefox "147.0" in cache
+2026-03-03 22:20:51,921 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:20:52,722 - INFO - Getting latest mozilla release info for v0.36.0
+2026-03-03 22:20:53,362 - INFO - About to download new driver from https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-win64.zip
+2026-03-03 22:20:54,567 - INFO - Driver downloading response is 200
+2026-03-03 22:20:55,652 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:20:56,158 - INFO - Driver has been saved in cache [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0]
+2026-03-03 22:20:56,161 - INFO - Lancement de Firefox...
+2026-03-03 22:21:14,862 - INFO - ERREUR: Message: 
+
+2026-03-03 22:21:30,854 - INFO - ====== WebDriver manager ======
+2026-03-03 22:21:32,863 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:21:33,488 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:21:33,992 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:21:33,993 - INFO - Lancement de Firefox...
+2026-03-03 22:21:52,706 - INFO - ERREUR: Message: 
+
+2026-03-03 22:23:29,198 - INFO - ====== WebDriver manager ======
+2026-03-03 22:23:31,223 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:23:32,073 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:23:32,580 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:23:32,581 - INFO - Lancement de Firefox...
+2026-03-03 22:23:51,435 - INFO - ERREUR: Message: 
+
+2026-03-03 22:26:41,855 - INFO - package: mysql.connector.plugins
+2026-03-03 22:26:41,855 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:26:41,856 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:26:48,079 - INFO - package: mysql.connector.plugins
+2026-03-03 22:26:48,079 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:26:48,080 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:26:49,176 - INFO - ====== WebDriver manager ======
+2026-03-03 22:26:51,226 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:26:52,278 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:26:52,922 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:26:52,922 - INFO - Lancement de Firefox...
+2026-03-03 22:27:17,037 - INFO - ERREUR: Message: 
+
+2026-03-03 22:29:19,568 - INFO - ====== WebDriver manager ======
+2026-03-03 22:29:21,590 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:29:22,582 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:29:23,224 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:29:23,225 - INFO - Lancement de Firefox...
+2026-03-03 22:29:45,578 - INFO - ERREUR: Message: 
+
+2026-03-03 22:32:25,635 - INFO - package: mysql.connector.plugins
+2026-03-03 22:32:25,635 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:32:25,636 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:32:26,915 - INFO - ====== WebDriver manager ======
+2026-03-03 22:32:28,956 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:32:30,621 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:32:31,655 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:32:31,656 - INFO - Lancement de Firefox...
+2026-03-03 22:32:39,283 - INFO - Vérification des cookies...
+2026-03-03 22:32:44,348 - INFO - Pas de pop-up cookies, on continue.
+2026-03-03 22:32:44,348 - INFO - Remplissage de l'email...
+2026-03-03 22:32:54,465 - INFO - ERREUR: Message: 
+
+2026-03-03 22:34:12,976 - INFO - package: mysql.connector.plugins
+2026-03-03 22:34:12,976 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:34:12,976 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:34:14,472 - INFO - ====== WebDriver manager ======
+2026-03-03 22:34:16,420 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:34:16,916 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:34:17,228 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:34:17,228 - INFO - Lancement de Firefox...
+2026-03-03 22:34:23,285 - INFO - Recherche du bandeau de cookies...
+2026-03-03 22:34:23,387 - INFO - Cookies acceptés.
+2026-03-03 22:34:24,387 - INFO - Remplissage de l'email...
+2026-03-03 22:34:34,426 - INFO - ERREUR: Message: 
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:202:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:555:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2026-03-03 22:37:12,553 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError("HTTPConnection(host='localhost', port=57458): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")': /session/695097d2-4209-4daf-9960-04487d779357
+2026-03-03 22:37:16,619 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError("HTTPConnection(host='localhost', port=57458): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")': /session/695097d2-4209-4daf-9960-04487d779357
+2026-03-03 22:37:24,049 - INFO - package: mysql.connector.plugins
+2026-03-03 22:37:24,050 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:37:24,051 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:37:29,668 - INFO - ====== WebDriver manager ======
+2026-03-03 22:37:31,617 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:37:31,979 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:37:32,295 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:37:32,295 - INFO - Lancement de Firefox...
+2026-03-03 22:37:38,371 - INFO - Recherche du bandeau de cookies...
+2026-03-03 22:37:38,464 - INFO - Cookies acceptés.
+2026-03-03 22:37:39,464 - INFO - Remplissage de l'email...
+2026-03-03 22:37:49,555 - INFO - ERREUR: Message: 
+
+2026-03-03 22:40:08,461 - INFO - package: mysql.connector.plugins
+2026-03-03 22:40:08,461 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:40:08,462 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:40:10,410 - INFO - ====== WebDriver manager ======
+2026-03-03 22:40:12,367 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:40:12,691 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:40:12,995 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:40:12,995 - INFO - Lancement de Firefox...
+2026-03-03 22:40:19,465 - INFO - Recherche du bandeau de cookies...
+2026-03-03 22:40:19,562 - INFO - Cookies refusés.
+2026-03-03 22:40:21,563 - INFO - Remplissage de l'email...
+2026-03-03 22:40:29,164 - INFO - ERREUR: Message: WebDriver session does not exist, or is not active; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:202:5
+InvalidSessionIDError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:472:5
+assert.that/<@chrome://remote/content/shared/webdriver/Assert.sys.mjs:581:13
+assert.session@chrome://remote/content/shared/webdriver/Assert.sys.mjs:38:4
+dispatch@chrome://remote/content/marionette/server.sys.mjs:315:19
+execute@chrome://remote/content/marionette/server.sys.mjs:289:16
+onPacket/<@chrome://remote/content/marionette/server.sys.mjs:262:20
+onPacket@chrome://remote/content/marionette/server.sys.mjs:263:9
+_onJSONObjectReady/<@chrome://remote/content/marionette/transport.sys.mjs:494:20
+
+2026-03-03 22:40:41,672 - INFO - package: mysql.connector.plugins
+2026-03-03 22:40:41,672 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:40:41,673 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:40:43,441 - INFO - ====== WebDriver manager ======
+2026-03-03 22:40:45,367 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:40:45,686 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:40:46,137 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:40:46,137 - INFO - Lancement de Firefox...
+2026-03-03 22:40:52,409 - INFO - Recherche du bandeau de cookies...
+2026-03-03 22:40:52,505 - INFO - Cookies refusés.
+2026-03-03 22:40:54,505 - INFO - Remplissage de l'email...
+2026-03-03 22:41:09,629 - INFO - ERREUR: Message: 
+
+2026-03-03 22:42:44,070 - INFO - package: mysql.connector.plugins
+2026-03-03 22:42:44,070 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:42:44,071 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:42:45,926 - INFO - ====== WebDriver manager ======
+2026-03-03 22:42:47,869 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:42:48,213 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:42:48,509 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:42:48,509 - INFO - Lancement de Firefox...
+2026-03-03 22:42:54,496 - INFO - Recherche du bandeau de cookies...
+2026-03-03 22:42:54,600 - INFO - Cookies refusés.
+2026-03-03 22:42:57,600 - INFO - Remplissage de l'email...
+2026-03-03 22:42:57,603 - INFO - ERREUR: Message: Unable to clear element that cannot be edited: <input name="email" type="hidden">
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:202:5
+InvalidElementStateError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:439:5
+interaction.clearElement@chrome://remote/content/marionette/interaction.sys.mjs:370:11
+clearElement@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:319:22
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:206:16
+
+2026-03-03 22:46:29,055 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError("HTTPConnection(host='localhost', port=58639): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")': /session/d30477d6-eca5-4404-a94d-ca5f2dd514a6
+2026-03-03 22:46:33,113 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError("HTTPConnection(host='localhost', port=58639): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")': /session/d30477d6-eca5-4404-a94d-ca5f2dd514a6
+2026-03-03 22:46:38,803 - INFO - package: mysql.connector.plugins
+2026-03-03 22:46:38,803 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:46:38,804 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:46:40,340 - INFO - ====== WebDriver manager ======
+2026-03-03 22:46:42,343 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:46:42,696 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:46:42,986 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:46:42,986 - INFO - Lancement de Firefox...
+2026-03-03 22:46:49,192 - INFO - Recherche du bandeau de cookies...
+2026-03-03 22:46:49,289 - INFO - Cookies refusés.
+2026-03-03 22:46:51,290 - INFO - Remplissage de l'email...
+2026-03-03 22:47:01,386 - INFO - ERREUR: Message: 
+
+2026-03-03 22:59:02,200 - INFO - package: mysql.connector.plugins
+2026-03-03 22:59:02,200 - INFO - plugin_name: mysql_native_password
+2026-03-03 22:59:02,201 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 22:59:03,439 - INFO - ====== WebDriver manager ======
+2026-03-03 22:59:05,517 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:59:05,869 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 22:59:06,187 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 22:59:06,188 - INFO - Lancement de Firefox...
+2026-03-03 22:59:12,891 - INFO - Recherche du bandeau de cookies...
+2026-03-03 22:59:12,986 - INFO - Cookies refusés.
+2026-03-03 22:59:14,986 - INFO - Remplissage de l'email...
+2026-03-03 22:59:15,560 - INFO - Clic sur Suivant...
+2026-03-03 22:59:16,562 - INFO - Bouton Suivant introuvable, on continue.
+2026-03-03 22:59:16,562 - INFO - Remplissage du mot de passe...
+2026-03-03 22:59:26,607 - INFO - ERREUR: Message: 
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:202:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:555:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2026-03-03 23:07:08,620 - INFO - package: mysql.connector.plugins
+2026-03-03 23:07:08,620 - INFO - plugin_name: mysql_native_password
+2026-03-03 23:07:08,620 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 23:07:10,035 - INFO - ====== WebDriver manager ======
+2026-03-03 23:07:12,112 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:07:12,423 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:07:12,725 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 23:07:12,725 - INFO - Lancement de Firefox...
+2026-03-03 23:07:19,030 - INFO - Recherche du bandeau de cookies...
+2026-03-03 23:07:19,130 - INFO - Cookies refusés.
+2026-03-03 23:07:21,131 - INFO - Remplissage de l'email...
+2026-03-03 23:07:21,703 - INFO - Clic sur Suivant...
+2026-03-03 23:07:24,763 - INFO - Remplissage du mot de passe...
+2026-03-03 23:07:25,329 - INFO - Clic sur le bouton de connexion...
+2026-03-03 23:08:10,749 - INFO - ERREUR: Message: 
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:202:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:555:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2026-03-03 23:11:47,375 - INFO - package: mysql.connector.plugins
+2026-03-03 23:11:47,375 - INFO - plugin_name: mysql_native_password
+2026-03-03 23:11:47,376 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 23:11:49,735 - INFO - ====== WebDriver manager ======
+2026-03-03 23:11:51,817 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:11:52,337 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:11:52,638 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 23:11:52,638 - INFO - Lancement de Firefox...
+2026-03-03 23:11:59,167 - INFO - Recherche du bandeau de cookies...
+2026-03-03 23:11:59,261 - INFO - Cookies refusés.
+2026-03-03 23:12:01,262 - INFO - Remplissage de l'email...
+2026-03-03 23:12:01,835 - INFO - Clic sur Suivant...
+2026-03-03 23:12:04,895 - INFO - Remplissage du mot de passe...
+2026-03-03 23:12:05,462 - INFO - Clic sur le bouton de connexion...
+2026-03-03 23:12:18,407 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=97047639
+2026-03-03 23:12:19,606 - INFO - Attente du chargement de l'historique...
+2026-03-03 23:12:21,617 - INFO - Analyse de 10 lignes trouvées...
+2026-03-03 23:12:21,845 - INFO - Succès : 10 tables extraites.
+2026-03-03 23:17:32,468 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=97047639
+2026-03-03 23:17:33,324 - INFO - Attente du chargement de l'historique...
+2026-03-03 23:17:35,333 - INFO - Analyse de 0 lignes trouvées...
+2026-03-03 23:17:35,333 - INFO - Aucune table trouvée.
+2026-03-03 23:24:30,481 - INFO - package: mysql.connector.plugins
+2026-03-03 23:24:30,481 - INFO - plugin_name: mysql_native_password
+2026-03-03 23:24:30,482 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 23:24:32,038 - INFO - ====== WebDriver manager ======
+2026-03-03 23:24:34,236 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:24:34,585 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:24:34,887 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 23:24:34,887 - INFO - Lancement de Firefox...
+2026-03-03 23:24:41,230 - INFO - Recherche du bandeau de cookies...
+2026-03-03 23:24:41,326 - INFO - Cookies refusés.
+2026-03-03 23:24:43,327 - INFO - Remplissage de l'email...
+2026-03-03 23:24:43,900 - INFO - Clic sur Suivant...
+2026-03-03 23:24:46,961 - INFO - Remplissage du mot de passe...
+2026-03-03 23:24:47,526 - INFO - Clic sur le bouton de connexion...
+2026-03-03 23:24:59,008 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=97047639
+2026-03-03 23:25:00,186 - INFO - Attente du chargement de l'historique...
+2026-03-03 23:25:02,196 - INFO - Analyse de 10 lignes trouvées...
+2026-03-03 23:25:02,465 - INFO - Succès : 10 tables extraites.
+2026-03-03 23:28:46,603 - INFO - package: mysql.connector.plugins
+2026-03-03 23:28:46,603 - INFO - plugin_name: mysql_native_password
+2026-03-03 23:28:46,604 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 23:28:48,042 - INFO - ====== WebDriver manager ======
+2026-03-03 23:28:50,124 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:28:50,590 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:28:50,891 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 23:28:50,892 - INFO - Lancement de Firefox...
+2026-03-03 23:28:57,683 - INFO - Recherche du bandeau de cookies...
+2026-03-03 23:28:57,787 - INFO - Cookies refusés.
+2026-03-03 23:28:59,788 - INFO - Remplissage de l'email...
+2026-03-03 23:29:00,362 - INFO - Clic sur Suivant...
+2026-03-03 23:29:03,421 - INFO - Remplissage du mot de passe...
+2026-03-03 23:29:03,988 - INFO - Clic sur le bouton de connexion...
+2026-03-03 23:29:11,809 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=97047639
+2026-03-03 23:29:12,993 - INFO - Attente du chargement de l'historique...
+2026-03-03 23:29:15,003 - INFO - Analyse de 10 lignes trouvées...
+2026-03-03 23:29:15,237 - INFO - Succès : 10 tables extraites.
+2026-03-03 23:34:23,498 - INFO - package: mysql.connector.plugins
+2026-03-03 23:34:23,498 - INFO - plugin_name: mysql_native_password
+2026-03-03 23:34:23,498 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 23:34:24,911 - INFO - ====== WebDriver manager ======
+2026-03-03 23:34:26,971 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:34:27,458 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:34:27,775 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 23:34:27,776 - INFO - Lancement de Firefox...
+2026-03-03 23:34:34,149 - INFO - Recherche du bandeau de cookies...
+2026-03-03 23:34:34,247 - INFO - Cookies refusés.
+2026-03-03 23:34:36,247 - INFO - Remplissage de l'email...
+2026-03-03 23:34:36,822 - INFO - Clic sur Suivant...
+2026-03-03 23:34:39,883 - INFO - Remplissage du mot de passe...
+2026-03-03 23:34:40,449 - INFO - Clic sur le bouton de connexion...
+2026-03-03 23:34:49,980 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=97047639
+2026-03-03 23:34:51,105 - INFO - Attente du chargement de l'historique...
+2026-03-03 23:34:53,117 - INFO - Analyse de 10 lignes trouvées...
+2026-03-03 23:34:53,396 - INFO - Succès : 10 tables extraites.
+2026-03-03 23:34:55,750 - INFO - Début du scrap sur 10 tables...
+2026-03-03 23:34:55,750 - INFO - Analyse Replay #697430384...
+2026-03-03 23:35:02,674 - INFO - Nombre de lignes d'historique trouvées : 0
+2026-03-03 23:35:02,674 - INFO - ATTENTION : Aucun log trouvé. Le replay est peut-être vide ou mal chargé.
+2026-03-03 23:35:02,674 - INFO - Analyse Replay #697124818...
+2026-03-03 23:35:09,260 - INFO - Nombre de lignes d'historique trouvées : 0
+2026-03-03 23:35:09,261 - INFO - ATTENTION : Aucun log trouvé. Le replay est peut-être vide ou mal chargé.
+2026-03-03 23:35:09,261 - INFO - Analyse Replay #697122830...
+2026-03-03 23:35:15,833 - INFO - Nombre de lignes d'historique trouvées : 0
+2026-03-03 23:35:15,834 - INFO - ATTENTION : Aucun log trouvé. Le replay est peut-être vide ou mal chargé.
+2026-03-03 23:35:15,834 - INFO - Analyse Replay #697112071...
+2026-03-03 23:35:22,395 - INFO - Nombre de lignes d'historique trouvées : 0
+2026-03-03 23:35:22,395 - INFO - ATTENTION : Aucun log trouvé. Le replay est peut-être vide ou mal chargé.
+2026-03-03 23:35:22,395 - INFO - Analyse Replay #697080398...
+2026-03-03 23:35:28,955 - INFO - Nombre de lignes d'historique trouvées : 0
+2026-03-03 23:35:28,955 - INFO - ATTENTION : Aucun log trouvé. Le replay est peut-être vide ou mal chargé.
+2026-03-03 23:35:28,956 - INFO - Analyse Replay #697084456...
+2026-03-03 23:35:35,519 - INFO - Nombre de lignes d'historique trouvées : 0
+2026-03-03 23:35:35,519 - INFO - ATTENTION : Aucun log trouvé. Le replay est peut-être vide ou mal chargé.
+2026-03-03 23:35:35,519 - INFO - Analyse Replay #697087214...
+2026-03-03 23:35:42,084 - INFO - Nombre de lignes d'historique trouvées : 0
+2026-03-03 23:35:42,084 - INFO - ATTENTION : Aucun log trouvé. Le replay est peut-être vide ou mal chargé.
+2026-03-03 23:35:42,084 - INFO - Analyse Replay #697073597...
+2026-03-03 23:35:48,697 - INFO - Nombre de lignes d'historique trouvées : 0
+2026-03-03 23:35:48,697 - INFO - ATTENTION : Aucun log trouvé. Le replay est peut-être vide ou mal chargé.
+2026-03-03 23:35:48,697 - INFO - Analyse Replay #697075852...
+2026-03-03 23:35:55,241 - INFO - Nombre de lignes d'historique trouvées : 0
+2026-03-03 23:35:55,242 - INFO - ATTENTION : Aucun log trouvé. Le replay est peut-être vide ou mal chargé.
+2026-03-03 23:35:55,242 - INFO - Analyse Replay #697077381...
+2026-03-03 23:36:01,804 - INFO - Nombre de lignes d'historique trouvées : 0
+2026-03-03 23:36:01,804 - INFO - ATTENTION : Aucun log trouvé. Le replay est peut-être vide ou mal chargé.
+2026-03-03 23:36:01,804 - INFO - === FIN DU SCRAPING : 0 PARTIES EN BDD ===
+2026-03-03 23:38:22,361 - INFO - package: mysql.connector.plugins
+2026-03-03 23:38:22,361 - INFO - plugin_name: mysql_native_password
+2026-03-03 23:38:22,361 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-03 23:38:46,658 - INFO - ====== WebDriver manager ======
+2026-03-03 23:38:48,701 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:38:49,180 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-03 23:38:49,519 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-03 23:38:49,519 - INFO - Lancement de Firefox...
+2026-03-03 23:38:56,040 - INFO - Recherche du bandeau de cookies...
+2026-03-03 23:38:56,138 - INFO - Cookies refusés.
+2026-03-03 23:38:58,139 - INFO - Remplissage de l'email...
+2026-03-03 23:38:58,713 - INFO - Clic sur Suivant...
+2026-03-03 23:39:01,773 - INFO - Remplissage du mot de passe...
+2026-03-03 23:39:02,339 - INFO - Clic sur le bouton de connexion...
+2026-03-03 23:39:14,091 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=97047639
+2026-03-03 23:39:15,210 - INFO - Attente du chargement de l'historique...
+2026-03-03 23:39:17,222 - INFO - Analyse de 10 lignes trouvées...
+2026-03-03 23:39:17,459 - INFO - Succès : 10 tables extraites.
+2026-03-03 23:39:19,632 - INFO - Début du scrap sur 10 tables...
+2026-03-03 23:39:19,633 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=697430384
+2026-03-03 23:39:27,833 - INFO - Logs trouvés : 4
+2026-03-03 23:39:27,846 - INFO - ÉCHEC : Aucun coup extrait pour la table 697430384
+2026-03-03 23:39:27,846 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=697124818
+2026-03-03 23:39:35,558 - INFO - Logs trouvés : 37
+2026-03-03 23:39:35,669 - INFO - SUCCÈS : Table 697124818 enregistrée (32 coups)
+2026-03-03 23:39:35,669 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=697122830
+2026-03-03 23:39:46,660 - INFO - Logs trouvés : 21
+2026-03-03 23:39:46,724 - INFO - SUCCÈS : Table 697122830 enregistrée (16 coups)
+2026-03-03 23:39:46,724 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=697112071
+2026-03-03 23:39:57,354 - INFO - Logs trouvés : 30
+2026-03-03 23:39:57,442 - INFO - SUCCÈS : Table 697112071 enregistrée (27 coups)
+2026-03-03 23:39:57,442 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=697080398
+2026-03-03 23:40:06,887 - INFO - Logs trouvés : 23
+2026-03-03 23:40:06,959 - INFO - SUCCÈS : Table 697080398 enregistrée (17 coups)
+2026-03-03 23:40:06,959 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=697084456
+2026-03-03 23:40:16,338 - INFO - Logs trouvés : 24
+2026-03-03 23:40:16,409 - INFO - SUCCÈS : Table 697084456 enregistrée (21 coups)
+2026-03-03 23:40:16,409 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=697087214
+2026-03-03 23:40:26,137 - INFO - Logs trouvés : 0
+2026-03-03 23:40:26,137 - INFO - Tentative de déplier le journal...
+2026-03-03 23:40:26,138 - INFO - ÉCHEC : Aucun coup extrait pour la table 697087214
+2026-03-03 23:40:26,139 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=697073597
+2026-03-03 23:40:35,756 - INFO - Logs trouvés : 0
+2026-03-03 23:40:35,756 - INFO - Tentative de déplier le journal...
+2026-03-03 23:40:35,757 - INFO - ÉCHEC : Aucun coup extrait pour la table 697073597
+2026-03-03 23:40:35,757 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=697075852
+2026-03-03 23:40:44,960 - INFO - Logs trouvés : 0
+2026-03-03 23:40:44,960 - INFO - Tentative de déplier le journal...
+2026-03-03 23:40:44,961 - INFO - ÉCHEC : Aucun coup extrait pour la table 697075852
+2026-03-03 23:40:44,961 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=697077381
+2026-03-03 23:40:52,697 - INFO - Logs trouvés : 0
+2026-03-03 23:40:52,697 - INFO - Tentative de déplier le journal...
+2026-03-03 23:40:52,698 - INFO - ÉCHEC : Aucun coup extrait pour la table 697077381
+2026-03-03 23:40:52,698 - INFO - === FIN DU SCRAPING : 5 PARTIES EN BDD ===
+2026-03-10 21:50:02,948 - INFO - ====== WebDriver manager ======
+2026-03-10 21:50:07,026 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-10 21:50:07,513 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-10 21:50:07,766 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-10 21:50:08,050 - INFO - Getting latest mozilla release info for v0.36.0
+2026-03-10 21:50:08,455 - INFO - About to download new driver from https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-win64.zip
+2026-03-10 21:50:09,131 - INFO - Driver downloading response is 200
+2026-03-10 21:50:09,804 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-10 21:50:10,087 - INFO - Driver has been saved in cache [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0]
+2026-03-10 21:50:10,089 - INFO - Lancement de Firefox...
+2026-03-10 21:50:18,689 - INFO - Recherche du bandeau de cookies...
+2026-03-10 21:50:18,831 - INFO - Cookies refusés.
+2026-03-10 21:50:20,832 - INFO - Remplissage de l'email...
+2026-03-10 21:50:21,408 - INFO - Clic sur Suivant...
+2026-03-10 21:50:24,467 - INFO - Remplissage du mot de passe...
+2026-03-10 21:50:25,039 - INFO - Clic sur le bouton de connexion...
+2026-03-10 21:50:33,755 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=94154229
+2026-03-10 21:50:36,151 - INFO - Attente du chargement de l'historique...
+2026-03-10 21:50:38,163 - INFO - Analyse de 10 lignes trouvées...
+2026-03-10 21:50:38,253 - INFO - Succès : 2 tables extraites.
+2026-03-10 21:50:42,937 - INFO - Début du scrap sur 2 tables...
+2026-03-10 21:50:42,937 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=816518007
+2026-03-10 21:50:51,245 - INFO - Logs trouvés : 22
+2026-03-10 21:50:53,341 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=815496006
+2026-03-10 21:51:01,065 - INFO - Logs trouvés : 15
+2026-03-10 21:51:03,157 - INFO - === FIN DU SCRAPING : 0 PARTIES EN BDD ===
+2026-03-10 21:51:48,718 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=90577406
+2026-03-10 21:51:49,451 - INFO - Attente du chargement de l'historique...
+2026-03-10 21:51:51,459 - INFO - Analyse de 10 lignes trouvées...
+2026-03-10 21:51:51,737 - INFO - Succès : 10 tables extraites.
+2026-03-10 21:51:57,009 - INFO - Début du scrap sur 10 tables...
+2026-03-10 21:51:57,009 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=794948451
+2026-03-10 21:52:04,949 - INFO - Logs trouvés : 15
+2026-03-10 21:52:07,038 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=748254761
+2026-03-10 21:52:16,203 - INFO - Logs trouvés : 21
+2026-03-10 21:52:18,314 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=612244699
+2026-03-10 21:52:27,637 - INFO - Logs trouvés : 43
+2026-03-10 21:52:29,805 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=612241708
+2026-03-10 21:52:38,999 - INFO - Logs trouvés : 44
+2026-03-10 21:52:41,171 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=611001161
+2026-03-10 21:52:50,811 - INFO - Logs trouvés : 43
+2026-03-10 21:52:52,973 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=610996411
+2026-03-10 21:53:02,214 - INFO - Logs trouvés : 42
+2026-03-10 21:53:04,378 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=610986416
+2026-03-10 21:53:14,052 - INFO - Logs trouvés : 43
+2026-03-10 21:53:16,245 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=610840485
+2026-03-10 21:53:25,807 - INFO - Logs trouvés : 0
+2026-03-10 21:53:25,807 - INFO - Tentative de déplier le journal...
+2026-03-10 21:53:25,808 - INFO - ÉCHEC : Aucun coup extrait pour la table 610840485
+2026-03-10 21:53:25,808 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=610842654
+2026-03-10 21:53:35,136 - INFO - Logs trouvés : 0
+2026-03-10 21:53:35,136 - INFO - Tentative de déplier le journal...
+2026-03-10 21:53:35,138 - INFO - ÉCHEC : Aucun coup extrait pour la table 610842654
+2026-03-10 21:53:35,138 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=610846692
+2026-03-10 21:53:44,567 - INFO - Logs trouvés : 0
+2026-03-10 21:53:44,567 - INFO - Tentative de déplier le journal...
+2026-03-10 21:53:44,569 - INFO - ÉCHEC : Aucun coup extrait pour la table 610846692
+2026-03-10 21:53:44,569 - INFO - === FIN DU SCRAPING : 0 PARTIES EN BDD ===
+2026-03-10 21:56:48,577 - INFO - package: mysql.connector.plugins
+2026-03-10 21:56:48,577 - INFO - plugin_name: mysql_native_password
+2026-03-10 21:56:48,582 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-10 21:56:51,321 - INFO - ====== WebDriver manager ======
+2026-03-10 21:56:54,297 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-10 21:56:54,736 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-10 21:56:55,013 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-10 21:56:55,013 - INFO - Lancement de Firefox...
+2026-03-10 21:57:03,324 - INFO - Recherche du bandeau de cookies...
+2026-03-10 21:57:03,439 - INFO - Cookies refusés.
+2026-03-10 21:57:05,440 - INFO - Remplissage de l'email...
+2026-03-10 21:57:06,013 - INFO - Clic sur Suivant...
+2026-03-10 21:57:09,074 - INFO - Remplissage du mot de passe...
+2026-03-10 21:57:09,645 - INFO - Clic sur le bouton de connexion...
+2026-03-10 21:57:26,109 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=90577406
+2026-03-10 21:57:27,234 - INFO - Attente du chargement de l'historique...
+2026-03-10 21:57:29,245 - INFO - Analyse de 10 lignes trouvées...
+2026-03-10 21:57:29,493 - INFO - Succès : 10 tables extraites.
+2026-03-10 21:57:32,008 - INFO - Début du scrap sur 10 tables...
+2026-03-10 21:57:32,008 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=794948451
+2026-03-10 21:57:40,028 - INFO - Erreur table 794948451 : Message: Failed to decode response from marionette
+
+2026-03-10 21:57:40,028 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=748254761
+2026-03-10 21:57:40,029 - INFO - Erreur table 748254761 : Message: Tried to run command without establishing a connection; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+
+2026-03-10 21:57:40,029 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=612244699
+2026-03-10 21:57:40,030 - INFO - Erreur table 612244699 : Message: Tried to run command without establishing a connection; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+
+2026-03-10 21:57:40,030 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=612241708
+2026-03-10 21:57:40,031 - INFO - Erreur table 612241708 : Message: Tried to run command without establishing a connection; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+
+2026-03-10 21:57:40,031 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=611001161
+2026-03-10 21:57:40,031 - INFO - Erreur table 611001161 : Message: Tried to run command without establishing a connection; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+
+2026-03-10 21:57:40,031 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=610996411
+2026-03-10 21:57:40,033 - INFO - Erreur table 610996411 : Message: Tried to run command without establishing a connection; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+
+2026-03-10 21:57:40,033 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=610986416
+2026-03-10 21:57:40,033 - INFO - Erreur table 610986416 : Message: Tried to run command without establishing a connection; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+
+2026-03-10 21:57:40,033 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=610840485
+2026-03-10 21:57:40,034 - INFO - Erreur table 610840485 : Message: Tried to run command without establishing a connection; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+
+2026-03-10 21:57:40,034 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=610842654
+2026-03-10 21:57:40,035 - INFO - Erreur table 610842654 : Message: Tried to run command without establishing a connection; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+
+2026-03-10 21:57:40,035 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=610846692
+2026-03-10 21:57:40,035 - INFO - Erreur table 610846692 : Message: Tried to run command without establishing a connection; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+
+2026-03-10 21:57:40,035 - INFO - === FIN DU SCRAPING : 0 PARTIES EN BDD ===
