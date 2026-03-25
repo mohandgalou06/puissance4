@@ -4,515 +4,567 @@
     <meta charset="UTF-8">
     <title>Terminator P4</title>
     <style>
-        :root { --bg:#121212; --panel:#1f1f2e; --soft:#0d0d16; --red:#e94560; --yellow:#f9a826; --green:#00ff88; --muted:#a0a0a0; }
-        body { font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; text-align:center; background:var(--bg); color:#fff; margin:0; padding:20px; }
-        h1 { color:var(--red); text-transform:uppercase; letter-spacing:2px; }
-        #menu { background:var(--panel); padding:28px; border-radius:15px; width:min(430px,calc(100vw - 40px)); margin:40px auto; border:2px solid rgba(233,69,96,.45); box-shadow:0 0 20px rgba(233,69,96,.3), inset 0 0 10px rgba(233,69,96,.16); box-sizing:border-box; }
-        .menu-group { margin-bottom:16px; }
-        label { display:block; margin-bottom:6px; color:var(--muted); font-weight:700; }
-        select, input[type="text"] { width:100%; padding:10px; border:1px solid var(--red); border-radius:6px; background:var(--soft); color:#fff; box-sizing:border-box; text-align:center; }
-        .btn { width:100%; border:0; border-radius:7px; background:var(--red); color:#fff; padding:13px 16px; font-weight:700; cursor:pointer; transition:.2s; }
-        .btn:hover { background:#ff5c77; box-shadow:0 0 14px rgba(233,69,96,.75); }
-        .mode-help { color:var(--muted); font-size:.92em; line-height:1.45; margin:-2px 0 14px; min-height:42px; }
-        #timers { display:none; justify-content:center; gap:20px; margin-bottom:20px; flex-wrap:wrap; }
-        .timer-box { min-width:220px; padding:10px 22px; border-radius:10px; background:var(--panel); border:2px solid transparent; font-size:1.25em; font-weight:700; transition:.25s; }
-        .timer-red { color:var(--red); } .timer-yellow { color:var(--yellow); } .active-turn { border-color:#fff; box-shadow:0 0 18px rgba(255,255,255,.28); transform:scale(1.03); }
-        .file-upload-wrapper { position:relative; overflow:hidden; width:100%; }
-        .file-upload-wrapper input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
-        .file-upload-btn { display:block; width:100%; padding:10px; background:var(--soft); color:var(--muted); border:1px solid var(--red); border-radius:6px; box-sizing:border-box; }
-        #game-area { display:none; }
-        #live-controls, #paint-controls { display:none; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap; width:fit-content; max-width:calc(100vw - 30px); margin:0 auto 18px; padding:14px; border-radius:10px; background:var(--panel); }
-        #status { min-height:28px; margin-bottom:6px; color:var(--yellow); font-weight:700; font-size:1.1em; }
-        #ia-msg { min-height:24px; margin-bottom:14px; color:var(--green); font-weight:700; }
-        .board { display:grid; grid-template-columns:repeat(9,55px); gap:8px; justify-content:center; width:fit-content; margin:0 auto; padding:15px 15px 5px; border-radius:15px; background:var(--panel); border:2px solid transparent; transition:.3s; }
-        .board.neon-rouge { border-color:rgba(233,69,96,.8); box-shadow:0 0 25px rgba(233,69,96,.45), inset 0 0 15px rgba(233,69,96,.25); }
-        .board.neon-jaune { border-color:rgba(249,168,38,.8); box-shadow:0 0 25px rgba(249,168,38,.45), inset 0 0 15px rgba(249,168,38,.25); }
-        .board.neon-neutre { border-color:rgba(0,255,136,.8); box-shadow:0 0 25px rgba(0,255,136,.4), inset 0 0 15px rgba(0,255,136,.18); }
-        .cell { position:relative; width:55px; height:55px; border-radius:50%; background:var(--soft); cursor:pointer; box-shadow:inset 0 5px 10px rgba(0,0,0,.8); }
-        .cell.rouge { background:var(--red); box-shadow:inset 0 -5px 15px rgba(0,0,0,.4), 0 0 10px rgba(233,69,96,.55); cursor:default; }
-        .cell.jaune { background:var(--yellow); box-shadow:inset 0 -5px 15px rgba(0,0,0,.4), 0 0 10px rgba(249,168,38,.55); cursor:default; }
-        .cell.winning-halo { z-index:2; }
-        .cell.winning-halo::before { content:""; position:absolute; inset:-6px; border-radius:50%; border:3px solid rgba(0,255,136,.98); box-shadow:0 0 10px rgba(0,255,136,.75), 0 0 24px rgba(0,255,136,.85), inset 0 0 10px rgba(0,255,136,.35); animation:winningPulse .75s ease-in-out infinite alternate; pointer-events:none; }
-        .board[data-hover="rouge"] .cell:not(.rouge):not(.jaune):hover { background:rgba(233,69,96,.2); }
-        .board[data-hover="jaune"] .cell:not(.rouge):not(.jaune):hover { background:rgba(249,168,38,.2); }
-        .cell.last-move::after { content:""; position:absolute; inset:50% auto auto 50%; width:14px; height:14px; transform:translate(-50%,-50%); border-radius:50%; background:rgba(255,255,255,.95); box-shadow:0 0 10px #fff; }
-        .col-number { width:55px; height:24px; line-height:24px; font-size:.88em; font-weight:700; color:#7a7a8c; }
-        #progress-container { display:none; width:min(410px,calc(100vw - 40px)); height:20px; margin:0 auto 18px; overflow:hidden; border-radius:20px; background:#2a2a35; }
-        #progress-bar { width:0%; height:100%; background:linear-gradient(90deg,var(--yellow),#ffcc70); transition:width .3s linear; }
-        .inline-group { display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
-        @keyframes winningPulse {
-            0% { transform:scale(0.98); opacity:.78; box-shadow:0 0 8px rgba(0,255,136,.6), 0 0 18px rgba(0,255,136,.72), inset 0 0 8px rgba(0,255,136,.3); }
-            100% { transform:scale(1.06); opacity:1; box-shadow:0 0 14px rgba(0,255,136,.96), 0 0 30px rgba(0,255,136,1), inset 0 0 12px rgba(0,255,136,.45); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #121212; color: #ffffff; margin: 0; padding: 20px;}
+        h1 { color: #e94560; text-transform: uppercase; letter-spacing: 2px; }
+        
+        #menu { background-color: #1f1f2e; padding: 30px; border-radius: 15px; width: 400px; margin: 50px auto; border: 2px solid rgba(233, 69, 96, 0.5); box-shadow: 0 0 20px rgba(233, 69, 96, 0.4), inset 0 0 10px rgba(233, 69, 96, 0.2); }
+        .menu-group { margin-bottom: 20px; text-align: left; transition: all 0.3s ease; }
+        label { display: block; margin-bottom: 5px; color: #a0a0a0; font-weight: bold; text-align: center; }
+        
+        select, input[type="range"], input[type="text"] { width: 100%; padding: 10px; background-color: #0d0d16; color: white; border: 1px solid #e94560; border-radius: 5px; text-align: center; text-align-last: center; font-size: 1em; cursor: pointer; box-sizing: border-box; }
+        input[type="text"] { cursor: text; text-align-last: auto; }
+        input[type="text"]:focus { outline: none; box-shadow: 0 0 10px rgba(233, 69, 96, 0.5); }
+        select option { text-align: center; }
+
+        .btn { background-color: #e94560; color: white; border: none; padding: 15px 20px; font-size: 1.1em; font-weight: bold; border-radius: 5px; cursor: pointer; width: 100%; transition: 0.3s;}
+        .btn:hover { background-color: #ff5c77; box-shadow: 0 0 15px #e94560; }
+        
+        .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-top: 5px;}
+        .file-upload-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; }
+        .file-upload-btn { background-color: #0d0d16; color: #a0a0a0; border: 1px solid #e94560; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box; display: block; text-align: center; font-weight: normal; cursor: pointer;}
+        .file-upload-wrapper:hover .file-upload-btn { background-color: #1f1f2e; color: white; }
+
+        #live-controls, #paint-controls { display: none; background-color: #1f1f2e; padding: 15px; border-radius: 10px; width: max-content; margin: 0 auto 20px auto; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; justify-content: center;}
+        
+        #game-area { display: none; }
+        #status { font-size: 1.2em; margin-bottom: 5px; color: #f9a826; font-weight: bold; height: 30px;}
+        #ia-msg { font-size: 1.1em; margin-bottom: 15px; color: #00ff88; font-weight: bold; height: 25px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 5px rgba(0,255,136,0.3);}
+        
+        .board { display: grid; grid-template-columns: repeat(9, 55px); gap: 8px; justify-content: center; background-color: #1f1f2e; padding: 15px 15px 5px 15px; border-radius: 15px; width: max-content; margin: 0 auto; border: 2px solid transparent; transition: 0.4s ease; }
+        .board.neon-rouge { border-color: rgba(233, 69, 96, 0.8); box-shadow: 0 0 25px rgba(233, 69, 96, 0.5), inset 0 0 15px rgba(233, 69, 96, 0.3); }
+        .board.neon-jaune { border-color: rgba(249, 168, 38, 0.8); box-shadow: 0 0 25px rgba(249, 168, 38, 0.5), inset 0 0 15px rgba(249, 168, 38, 0.3); }
+        .board.neon-neutre { border-color: rgba(0, 255, 136, 0.8); box-shadow: 0 0 25px rgba(0, 255, 136, 0.5), inset 0 0 15px rgba(0, 255, 136, 0.3); }
+        
+        .cell { position: relative; width: 55px; height: 55px; background-color: #0d0d16; border-radius: 50%; cursor: pointer; transition: 0.3s; box-shadow: inset 0 5px 10px rgba(0,0,0,0.8); }
+        .cell.rouge { background-color: #e94560; box-shadow: inset 0 -5px 15px rgba(0,0,0,0.4), 0 0 10px rgba(233, 69, 96, 0.6); cursor: default; }
+        .cell.jaune { background-color: #f9a826; box-shadow: inset 0 -5px 15px rgba(0,0,0,0.4), 0 0 10px rgba(249, 168, 38, 0.6); cursor: default; }
+        .board[data-hover="rouge"] .cell:not(.rouge):not(.jaune):hover { background-color: rgba(233, 69, 96, 0.2); }
+        .board[data-hover="jaune"] .cell:not(.rouge):not(.jaune):hover { background-color: rgba(249, 168, 38, 0.2); }
+        
+        .cell.last-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; background-color: rgba(255, 255, 255, 0.9); border-radius: 50%; box-shadow: 0 0 10px white; pointer-events: none; }
+        
+        /* 🔥 Le néon vert scintillant pour la victoire */
+        .cell.winning-cell::before {
+            content: ''; position: absolute; inset: -5px; border: 3px solid rgba(0, 255, 136, 0.95);
+            border-radius: 50%; box-shadow: 0 0 10px rgba(0, 255, 136, 0.85), 0 0 24px rgba(0, 255, 136, 0.65);
+            animation: winning-pulse 1s ease-in-out infinite; pointer-events: none;
         }
-        @media (max-width:760px) { .board { grid-template-columns:repeat(9,34px); gap:5px; padding:10px 10px 4px; } .cell,.col-number { width:34px; } .cell { height:34px; } .col-number { height:20px; line-height:20px; font-size:.8em; } }
+
+        @keyframes winning-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 10px rgba(0, 255, 136, 0.85), 0 0 24px rgba(0, 255, 136, 0.65); }
+            50% { transform: scale(1.08); opacity: 1; box-shadow: 0 0 16px rgba(0, 255, 136, 1), 0 0 32px rgba(0, 255, 136, 0.9); }
+        }
+        
+        .col-number { width: 55px; height: 25px; line-height: 25px; text-align: center; font-weight: bold; color: #7a7a8c; font-size: 0.9em; cursor: default; }
+        #progress-container { width: 400px; background-color: #2a2a35; border-radius: 20px; margin: 0 auto 20px auto; height: 20px; display: none; overflow: hidden;}
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #f9a826, #ffcc70); transition: width 0.3s linear;}
+        
+        #timers { display: none; justify-content: center; gap: 40px; margin-bottom: 20px; }
+        .timer-box { padding: 10px 25px; border-radius: 10px; font-size: 1.5em; font-weight: bold; background: #1f1f2e; border: 2px solid transparent; transition: 0.3s; }
+        .timer-red { color: #e94560; }
+        .timer-yellow { color: #f9a826; }
+        .active-turn { border-color: white; box-shadow: 0 0 20px rgba(255,255,255,0.4); transform: scale(1.05); }
     </style>
 </head>
 <body>
-    <h1>Puissance 4 - Terminator</h1>
+
+    <h1>Terminator P4</h1>
 
     <div id="timers">
-        <div id="box-red" class="timer-box timer-red">Rouge<br><span id="label-red">Joueur Rouge</span><br><span id="time-red">10:00</span></div>
-        <div id="box-yellow" class="timer-box timer-yellow">Jaune<br><span id="label-yellow">Joueur Jaune</span><br><span id="time-yellow">10:00</span></div>
+        <div id="box-red" class="timer-box timer-red">🔴 <span id="label-red">Rouge</span> <br><span id="time-red">10:00</span></div>
+        <div id="box-yellow" class="timer-box timer-yellow">🟡 <span id="label-yellow">Jaune</span> <br><span id="time-yellow">10:00</span></div>
     </div>
 
     <div id="menu">
-        <h2>Configuration du match</h2>
+        <h2>Configuration du Match</h2>
         <div class="menu-group">
-            <label for="select-mode">Mode de jeu</label>
-            <select id="select-mode" onchange="updateModeSettings()">
-                <option value="pvia">Joueur vs IA</option>
-                <option value="pvp">Humain vs Humain</option>
-                <option value="iavia">IA vs IA</option>
+            <label>Mode de Jeu</label>
+            <select id="select-mode">
+                <option value="pvia">🔴・Joueur VS IA・🟡</option>
             </select>
         </div>
-        <div id="mode-help" class="mode-help"></div>
-        <div class="menu-group" id="starter-group">
-            <label for="select-starter">Qui commence ?</label>
-            <select id="select-starter">
-                <option value="human">Vous commencez (Rouges)</option>
-                <option value="ia">L'IA commence (Rouges)</option>
-            </select>
+        <div id="ia-settings">
+            <div class="menu-group" id="starter-group">
+                <label>Qui commence ?</label>
+                <select id="select-starter">
+                    <option value="human">👤 Vous commencez (Rouges)</option>
+                    <option value="ia">🤖 L'IA commence (Rouges)</option>
+                </select>
+            </div>
         </div>
+        
         <button id="btn-start-game" class="btn" onclick="startGame()">NOUVELLE PARTIE</button>
-        <button class="btn" style="background:#8e44ad; margin-top:14px;" onclick="enterPaintMode()">CREER UN PLATEAU SUR MESURE</button>
-        <div style="margin-top:26px; padding-top:18px; border-top:1px solid rgba(233,69,96,.3);">
-            <h3 style="color:var(--muted); font-size:1em; margin-bottom:14px; text-transform:uppercase;">Importer une partie</h3>
+        <button class="btn" style="background-color: #8e44ad; margin-top: 15px;" onclick="enterPaintMode()">🎨 MODE PEINTURE</button>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(233, 69, 96, 0.3);">
+            <h3 style="color: #a0a0a0; font-size: 1em; margin-bottom: 15px; text-transform: uppercase;">Benoît TRUONG & Vesagatheepan SIVARAJAH</h3>
             <div class="menu-group">
-                <label for="import-string">1. Sequence texte (ex: 44455)</label>
+                <label>1. Séquence texte (ex: 44455)</label>
                 <input type="text" id="import-string" placeholder="Saisir les colonnes">
             </div>
             <div class="menu-group">
-                <label for="import-file">2. Ou importer un fichier texte (.txt)</label>
+                <label>2. Ou importer un fichier texte (.txt)</label>
                 <div class="file-upload-wrapper">
-                    <span class="file-upload-btn" id="file-upload-label">Parcourir un fichier...</span>
-                    <input type="file" id="import-file" accept=".txt" onchange="onImportFileSelected()">
+                    <button class="file-upload-btn" id="file-upload-label">📁 Parcourir un fichier...</button>
+                    <input type="file" id="import-file" accept=".txt" onchange="document.getElementById('file-upload-label').innerText = 'Fichier prêt : ' + this.files[0].name">
                 </div>
             </div>
-            <button class="btn" style="background:var(--yellow); color:#121212;" onclick="importGame()">IMPORTER ET REPRENDRE</button>
+            <button class="btn" style="background-color: #f9a826; color:#121212; margin-top: 5px;" onclick="importGame()">IMPORTER ET REPRENDRE</button>
         </div>
     </div>
 
     <div id="game-area">
-        <div id="paint-controls">
-            <div class="inline-group">
-                <label style="margin:0; color:#fff;">Pinceau :</label>
-                <select id="paint-color-select" style="width:auto; padding:5px;" onchange="paintColor = parseInt(this.value, 10)">
-                    <option value="1">Poser pion rouge</option>
-                    <option value="2">Poser pion jaune</option>
-                    <option value="0">Gomme</option>
+        
+        <div id="paint-controls" style="display: none; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; background-color: #1f1f2e; padding: 15px; border-radius: 10px; width: max-content; margin-left: auto; margin-right: auto; flex-wrap: wrap;">
+            
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <label style="margin: 0; color: white;">1. Pinceau :</label>
+                <select id="paint-color-select" style="width: auto; padding: 5px;" onchange="paintColor = parseInt(this.value)">
+                    <option value="1">🔴 Poser Pion Rouge</option>
+                    <option value="2">🟡 Poser Pion Jaune</option>
+                    <option value="0">⚫ Gomme (Effacer)</option>
                 </select>
             </div>
-            <div id="paint-human-color-group" class="inline-group" style="border-left:2px solid #555; padding-left:12px;">
-                <label style="margin:0; color:#fff;">Humain :</label>
-                <select id="paint-human-color" style="width:auto; padding:5px;">
+
+            <div style="display: flex; gap: 10px; align-items: center; border-left: 2px solid #555; padding-left: 15px;">
+                <label style="margin: 0; color: white;">2. Pour la partie :</label>
+                <select id="paint-human-color" style="width: auto; padding: 5px;">
                     <option value="rouge">L'humain est Rouge</option>
                     <option value="jaune">L'humain est Jaune</option>
                 </select>
-            </div>
-            <div class="inline-group" style="border-left:2px solid #555; padding-left:12px;">
-                <label style="margin:0; color:#fff;">Prochain tour :</label>
-                <select id="paint-next-turn" style="width:auto; padding:5px;">
-                    <option value="rouge">Rouge joue</option>
-                    <option value="jaune">Jaune joue</option>
+                <select id="paint-next-turn" style="width: auto; padding: 5px;">
+                    <option value="rouge">Prochain à jouer : Rouge</option>
+                    <option value="jaune">Prochain à jouer : Jaune</option>
                 </select>
             </div>
-            <div class="inline-group" style="width:100%;">
-                <button class="btn" style="width:auto; background:#3498db; padding:8px 14px;" onclick="analyzeBoard()">ANALYSER (IA)</button>
-                <button class="btn" style="width:auto; background:#27ae60; padding:8px 14px;" onclick="exitPaintMode()">VALIDER LE PLATEAU</button>
-                <button class="btn" style="width:auto; background:#555; padding:8px 14px;" onclick="location.reload()">QUITTER</button>
+
+            <div style="width: 100%; display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
+                <button class="btn" style="width: auto; background-color: #3498db; padding: 8px 15px;" onclick="analyzeBoard()">🔍 ANALYSER (IA)</button>
+                <button class="btn" style="width: auto; background-color: #27ae60; padding: 8px 15px;" onclick="exitPaintMode()">✅ VALIDER LE PLATEAU</button>
+                <button class="btn" style="width: auto; background-color: #555; padding: 8px 15px;" onclick="location.reload()">🚪 QUITTER</button>
             </div>
         </div>
 
         <div id="live-controls">
-            <button class="btn" style="width:auto; padding:10px; background:#d9534f;" onclick="undoMove()">Annuler</button>
-            <button id="btn-abandon" class="btn" style="width:auto; padding:10px; background:#c0392b;" onclick="abandonGame()">Abandonner</button>
-            <button class="btn" style="width:auto; padding:10px; background:var(--yellow); color:#000;" onclick="location.reload()">Recommencer</button>
-            <button class="btn" style="width:auto; padding:10px; background:#555;" onclick="location.reload()">Quitter</button>
+            <div style="background: #0d0d16; padding: 5px 15px; border-radius: 5px; border: 1px solid #555; display: flex; gap: 10px; align-items: center;">
+                <span style="color:#e94560; font-weight:bold;">🔴 Rouge :</span>
+                <select id="live-red-type" onchange="onTypeChange()" style="background: #1f1f2e; color: white; border: none; padding: 5px; border-radius: 3px; outline: none; cursor:pointer;">
+                    <option value="human">Humain</option>
+                    <option value="ia">IA</option>
+                </select>
+                <span style="color:#f9a826; font-weight:bold; margin-left:10px;">🟡 Jaune :</span>
+                <select id="live-yellow-type" onchange="onTypeChange()" style="background: #1f1f2e; color: white; border: none; padding: 5px; border-radius: 3px; outline: none; cursor:pointer;">
+                    <option value="human">Humain</option>
+                    <option value="ia">IA</option>
+                </select>
+            </div>
+
+            <button class="btn" style="padding: 10px; width: auto; background-color: #d9534f;" onclick="undoMove()">↩️ Annuler</button>
+            <button class="btn" style="padding: 10px; width: auto; background-color: #f9a826; color: black;" onclick="location.reload()">🔄 Recommencer</button>
+            <button class="btn" style="padding: 10px; width: auto; background-color: #555; margin-left: auto;" onclick="location.reload()">🚪 Quitter</button>
         </div>
 
-        <div id="status">Preparation de la grille...</div>
+        <div id="status">Préparation de la grille...</div>
         <div id="ia-msg"></div>
         <div id="progress-container"><div id="progress-bar"></div></div>
-        <div id="board" class="board neon-rouge" data-hover="rouge"></div>
+        
+        <div class="board neon-rouge" id="board" data-hover="rouge"></div>
     </div>
 
     <script>
-        const lignes = 9, colonnes = 9, $ = (id) => document.getElementById(id);
-        let jeuTermine = false, isAiThinking = false, currentColorTurn = "rouge", humanColor = "rouge", gameMode = "pvia";
-        let paintMode = false, paintColor = 1, previousGrille = null, customBoardActive = false, winningCells = [];
-        let timeRed = 600, timeYellow = 600, timerInterval = null, aiPollingInterval = null;
+        const TAB_ID = Math.random().toString(36).substring(2, 15);
 
-        const emptyGrid = () => Array.from({ length: lignes }, () => Array(colonnes).fill(0));
-        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-        const toggleColor = (color) => color === "rouge" ? "jaune" : "rouge";
-        const colorToInt = (color) => color === "rouge" ? 1 : 2;
-        const getSelectedMode = () => $("select-mode").value;
-        const fetchJson = async (url, payload) => (await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: payload ? JSON.stringify(payload) : null })).json();
+        const lignes = 9, colonnes = 9;
+        let jeuTermine = false;
+        let isAiThinking = false; 
+        let currentColorTurn = 'rouge'; 
+        let paintMode = false;
+        let paintColor = 1;
+        let previousGrille = null;
+        let customBoardActive = false;
+        let winningCells = [];
 
-        function controllerFor(color) {
-            if (gameMode === "pvp") return "human";
-            if (gameMode === "iavia") return "ia";
-            return color === humanColor ? "human" : "ia";
+        let timeRed = 600, timeYellow = 600;
+        let timerInterval;
+        let aiPollingInterval;
+
+        function setBoardNeon(color) {
+            const board = document.getElementById('board');
+            board.classList.remove('neon-rouge', 'neon-jaune', 'neon-neutre');
+            if(color === 'rouge') board.classList.add('neon-rouge');
+            else if(color === 'jaune') board.classList.add('neon-jaune');
+            else board.classList.add('neon-neutre');
         }
 
-        function labelFor(color) {
-            if (gameMode === "pvp") return color === "rouge" ? "Joueur Rouge" : "Joueur Jaune";
-            if (gameMode === "iavia") return color === "rouge" ? "IA Rouge" : "IA Jaune";
-            return controllerFor(color) === "human" ? "Vous" : "IA Terminator";
-        }
+        function checkNextTurn() {
+            if (jeuTermine) return;
+            let currentType = (currentColorTurn === 'rouge') ? document.getElementById('live-red-type').value : document.getElementById('live-yellow-type').value;
 
-        function updatePlayerLabels() {
-            if (gameMode === "pvp") {
-                $("label-red").innerText = "Joueur Rouge";
-                $("label-yellow").innerText = "Joueur Jaune";
-            } else if (gameMode === "iavia") {
-                $("label-red").innerText = "IA Rouge";
-                $("label-yellow").innerText = "IA Jaune";
+            if (currentType === 'ia') {
+                document.getElementById('status').innerText = "L'IA (" + (currentColorTurn === 'rouge' ? 'Rouge' : 'Jaune') + ") analyse...";
+                document.getElementById('board').setAttribute('data-hover', 'none');
+                setBoardNeon(currentColorTurn);
+                if (!isAiThinking) {
+                    setTimeout(() => { declencherIA(); }, 100);
+                }
             } else {
-                $("label-red").innerText = humanColor === "rouge" ? "Vous (Humain)" : "IA Terminator";
-                $("label-yellow").innerText = humanColor === "jaune" ? "Vous (Humain)" : "IA Terminator";
+                document.getElementById('status').innerText = "À vous de jouer (" + (currentColorTurn === 'rouge' ? 'Rouge' : 'Jaune') + ") !";
+                document.getElementById('board').setAttribute('data-hover', currentColorTurn);
+                setBoardNeon(currentColorTurn);
+                jeuTermine = false;
             }
         }
 
-        function updateModeSettings() {
-            gameMode = getSelectedMode();
-            $("starter-group").style.display = gameMode === "pvia" ? "block" : "none";
-            $("paint-human-color-group").style.display = gameMode === "pvia" ? "flex" : "none";
-            $("mode-help").innerText = gameMode === "pvp"
-                ? "Deux humains jouent sur la meme grille, chacun son tour."
-                : gameMode === "iavia"
-                    ? "Les deux couleurs sont pilotees par l'IA pour lancer un duel automatique."
-                    : "Vous pouvez jouer contre l'IA, choisir qui commence et reprendre sur un plateau personnalise.";
+        function onTypeChange() {
+            if (!jeuTermine && !isAiThinking) checkNextTurn();
         }
 
         function updateTimersDisplay() {
-            const fmt = (t) => `${Math.floor(t / 60)}:${t % 60 < 10 ? "0" : ""}${t % 60}`;
-            $("time-red").innerText = fmt(timeRed);
-            $("time-yellow").innerText = fmt(timeYellow);
-        }
-
-        function setBoardNeon(color) {
-            $("board").classList.remove("neon-rouge", "neon-jaune", "neon-neutre");
-            $("board").classList.add(color === "rouge" ? "neon-rouge" : color === "jaune" ? "neon-jaune" : "neon-neutre");
-        }
-
-        function switchTimer(color) {
-            $("box-red").classList.toggle("active-turn", color === "rouge");
-            $("box-yellow").classList.toggle("active-turn", color === "jaune");
-        }
-
-        function updateAbandonButton() {
-            $("btn-abandon").innerText = jeuTermine
-                ? "Abandonner"
-                : gameMode === "iavia"
-                    ? `Abandonner ${labelFor(currentColorTurn)}`
-                    : gameMode === "pvp"
-                        ? `Abandonner (${labelFor(currentColorTurn)})`
-                        : controllerFor(currentColorTurn) === "human" ? "Abandonner" : "Faire abandonner l'IA";
-        }
-
-        function findLastMove(oldGrid, newGrid) {
-            if (!oldGrid || !newGrid) return null;
-            for (let l = 0; l < lignes; l++) for (let c = 0; c < colonnes; c++) if (oldGrid[l][c] !== newGrid[l][c] && newGrid[l][c] !== 0) return { l, c };
-            return null;
-        }
-
-        function isWinningCell(l, c) {
-            return winningCells.some(([wl, wc]) => wl === l && wc === c);
-        }
-
-        function applyGameState(data) {
-            winningCells = Array.isArray(data.winning_cells) ? data.winning_cells : [];
-            drawBoard(data.grille);
-        }
-
-        function drawBoard(grille) {
-            const board = $("board"), last = findLastMove(previousGrille, grille);
-            board.innerHTML = "";
-            for (let l = 0; l < lignes; l++) {
-                for (let c = 0; c < colonnes; c++) {
-                    const cell = document.createElement("div");
-                    cell.className = "cell";
-                    if (grille[l][c] === 1) cell.classList.add("rouge");
-                    if (grille[l][c] === 2) cell.classList.add("jaune");
-                    if (isWinningCell(l, c)) cell.classList.add("winning-halo");
-                    if (last && last.l === l && last.c === c && !paintMode) cell.classList.add("last-move");
-                    cell.onclick = () => paintMode ? (!isAiThinking && paintCell(l, c)) : (grille[l][c] === 0 && playMove(c));
-                    board.appendChild(cell);
-                }
-            }
-            for (let c = 0; c < colonnes; c++) {
-                const num = document.createElement("div");
-                num.className = "col-number";
-                num.innerText = c + 1;
-                board.appendChild(num);
-            }
-            previousGrille = JSON.parse(JSON.stringify(grille));
-        }
-
-        function turnUi(message) {
-            if (jeuTermine) return;
-            $("status").style.color = "#f9a826";
-            switchTimer(currentColorTurn);
-            setBoardNeon(currentColorTurn);
-            $("board").setAttribute("data-hover", controllerFor(currentColorTurn) === "human" && !paintMode ? currentColorTurn : "none");
-            $("status").innerText = message || (controllerFor(currentColorTurn) === "human" ? (gameMode === "pvp" ? `${labelFor(currentColorTurn)} a vous de jouer !` : "A vous de jouer !") : `${labelFor(currentColorTurn)} reflechit...`);
-            updateAbandonButton();
-        }
-
-        function handleWin(data) {
-            jeuTermine = true;
-            isAiThinking = false;
-            clearInterval(timerInterval);
-            clearInterval(aiPollingInterval);
-            const nul = data.winner_type === "draw" || data.vainqueur === "Nul";
-            const humanWin = gameMode === "pvia" && controllerFor(data.winner_color) === "human";
-            const aiWin = gameMode === "pvia" && controllerFor(data.winner_color) === "ia";
-            $("status").innerText = nul ? "Match nul !" : humanWin ? "Victoire de l'humain !" : aiWin ? "Victoire de l'IA !" : `Victoire de ${labelFor(data.winner_color)} !`;
-            $("status").style.color = nul ? "#ffcc00" : "#00ff88";
-            $("board").setAttribute("data-hover", "none");
-            setBoardNeon("neutre");
-            updateAbandonButton();
-        }
-
-        function startProgressBar() {
-            $("progress-container").style.display = "block";
-            $("progress-bar").style.width = "0%";
-            const start = Date.now();
-            clearInterval(aiPollingInterval);
-            aiPollingInterval = setInterval(async () => {
-                $("progress-bar").style.width = `${Math.min(((Date.now() - start) / 14000) * 100, 100)}%`;
-                try {
-                    const data = await (await fetch("/status_ia")).json();
-                    if (data.profondeur > 0 && $("ia-msg").innerText === "") $("ia-msg").innerText = `Profondeur exploree : ${data.profondeur}...`;
-                } catch (error) {}
-            }, 400);
-        }
-
-        function stopProgressBar() {
-            clearInterval(aiPollingInterval);
-            $("progress-bar").style.width = "100%";
-            setTimeout(() => { $("progress-container").style.display = "none"; }, 350);
-        }
-
-        function handleTimeout(expiredColor) {
-            $("ia-msg").innerText = `${labelFor(expiredColor)} perd au temps.`;
-            handleWin({ winner_color: toggleColor(expiredColor), winner_type: controllerFor(toggleColor(expiredColor)) });
+            let rM = Math.floor(timeRed/60), rS = timeRed%60;
+            let yM = Math.floor(timeYellow/60), yS = timeYellow%60;
+            document.getElementById('time-red').innerText = `${rM}:${rS<10?'0':''}${rS}`;
+            document.getElementById('time-yellow').innerText = `${yM}:${yS<10?'0':''}${yS}`;
         }
 
         function startTimers() {
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
-                if (jeuTermine || paintMode) return;
-                currentColorTurn === "rouge" ? timeRed-- : timeYellow--;
+                if (jeuTermine) return; 
+                if (currentColorTurn === 'rouge') timeRed--; else timeYellow--;
                 updateTimersDisplay();
-                if (timeRed <= 0) { clearInterval(timerInterval); handleTimeout("rouge"); }
-                if (timeYellow <= 0) { clearInterval(timerInterval); handleTimeout("jaune"); }
+                if (timeRed <= 0 || timeYellow <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Temps écoulé !");
+                    jeuTermine = true;
+                }
             }, 1000);
         }
 
-        async function prepareGameArea() {
-            gameMode = getSelectedMode();
-            paintMode = false;
-            jeuTermine = false;
-            isAiThinking = false;
-            previousGrille = null;
-            winningCells = [];
-            $("menu").style.display = "none";
-            $("paint-controls").style.display = "none";
-            $("game-area").style.display = "block";
-            $("live-controls").style.display = "flex";
-            $("timers").style.display = "flex";
-            $("ia-msg").innerText = "";
-            $("ia-msg").style.color = "#00ff88";
-            $("status").style.color = "#f9a826";
-            timeRed = 600; timeYellow = 600; updateTimersDisplay(); switchTimer("rouge"); updateAbandonButton();
+        function switchTimer(colorTurn) {
+            currentColorTurn = colorTurn;
+            document.getElementById('box-red').classList.toggle('active-turn', colorTurn === 'rouge');
+            document.getElementById('box-yellow').classList.toggle('active-turn', colorTurn === 'jaune');
         }
 
-        function configureParticipants() {
-            gameMode = getSelectedMode();
-            if (gameMode === "pvia") {
-                humanColor = $("select-starter").value === "ia" ? "jaune" : "rouge";
-            } else {
-                humanColor = "rouge";
+        function findLastMove(oldG, newG) {
+            if (!oldG || !newG) return null;
+            for (let l = 0; l < lignes; l++) {
+                for (let c = 0; c < colonnes; c++) {
+                    if (oldG[l][c] !== newG[l][c] && newG[l][c] !== 0) return {l, c};
+                }
             }
-            currentColorTurn = "rouge";
-            updatePlayerLabels();
+            return null;
+        }
+
+        // 🔥 CORRECTION ICI : la variable s'appelle `winning_cells` depuis le serveur Python
+        function drawBoard(grille, winCells = []) {
+            const boardDiv = document.getElementById('board');
+            boardDiv.innerHTML = '';
+            winningCells = Array.isArray(winCells) ? winCells : [];
+            const lastMove = findLastMove(previousGrille, grille);
+            const winningSet = new Set(winningCells.map(([l, c]) => `${l},${c}`));
+
+            for (let l = 0; l < lignes; l++) {
+                for (let c = 0; c < colonnes; c++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    if (grille) {
+                        if (grille[l][c] === 1) cell.classList.add('rouge');
+                        if (grille[l][c] === 2) cell.classList.add('jaune');
+                        if (lastMove && lastMove.l === l && lastMove.c === c && !paintMode) cell.classList.add('last-move');
+                        if (winningSet.has(`${l},${c}`)) cell.classList.add('winning-cell');
+                    }
+                    cell.onclick = () => { 
+                        if (paintMode && !isAiThinking) paintCell(l, c); 
+                        else if (grille[l][c] === 0 && !paintMode) playMove(c); 
+                    };
+                    boardDiv.appendChild(cell);
+                }
+            }
+            for (let c = 0; c < colonnes; c++) {
+                const num = document.createElement('div');
+                num.classList.add('col-number');
+                num.innerText = c + 1;
+                boardDiv.appendChild(num);
+            }
+            if (grille) previousGrille = JSON.parse(JSON.stringify(grille));
         }
 
         async function enterPaintMode() {
-            updateModeSettings();
-            $("menu").style.display = "none";
-            $("game-area").style.display = "block";
-            $("live-controls").style.display = "none";
-            $("timers").style.display = "none";
-            $("paint-controls").style.display = "flex";
-            $("status").innerText = "Mode peinture";
-            $("status").style.color = "#f9a826";
-            $("ia-msg").innerText = "";
-            $("board").setAttribute("data-hover", "none");
-            setBoardNeon("neutre");
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('live-controls').style.display = 'none';
+            document.getElementById('timers').style.display = 'none';
+            document.getElementById('paint-controls').style.display = 'flex';
+            
+            document.getElementById('status').innerText = "🖌️ Mode Peinture";
+            document.getElementById('ia-msg').innerText = "";
+            document.getElementById('board').setAttribute('data-hover', 'none');
+            setBoardNeon('neutre');
+            
             paintMode = true;
             customBoardActive = true;
-            jeuTermine = false;
-            previousGrille = null;
-            winningCells = [];
-            await fetchJson("/reset");
-            drawBoard(emptyGrid());
+            previousGrille = null; 
+            await fetch('/reset', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({tab_id: TAB_ID}) }); 
+            drawBoard(Array(9).fill().map(()=>Array(9).fill(0)), []); 
         }
 
         async function paintCell(r, c) {
-            drawBoard((await fetchJson("/paint", { row: r, col: c, color: paintColor })).grille);
+            const res = await fetch('/paint', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ row: r, col: c, color: paintColor, tab_id: TAB_ID })
+            });
+            const data = await res.json();
+            // 🔥 CORRECTION ICI : data.winning_cells
+            drawBoard(data.grille, data.winning_cells || []);
         }
 
         async function analyzeBoard() {
             if (isAiThinking) return;
             isAiThinking = true;
-            $("ia-msg").innerText = "";
-            $("ia-msg").style.color = "#00ff88";
+            document.getElementById('ia-msg').innerText = "";
+            document.getElementById('ia-msg').style.color = "#00ff88";
+            
+            const nextTurnColor = document.getElementById('paint-next-turn').value;
+            const colorInt = (nextTurnColor === 'rouge') ? 1 : 2;
+            
             startProgressBar();
-            try {
-                const data = await fetchJson("/play", { action: "analyze", color: colorToInt($("paint-next-turn").value) });
-                if (data.message_ia) $("ia-msg").innerText = data.message_ia;
-            } finally {
-                stopProgressBar();
-                isAiThinking = false;
+            
+            const res = await fetch('/play', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'analyze', color: colorInt, tab_id: TAB_ID })
+            });
+            const data = await res.json();
+            
+            stopProgressBar();
+            isAiThinking = false;
+
+            if (data.message_ia) {
+                document.getElementById('ia-msg').innerText = data.message_ia;
+                if (data.message_ia.includes("MAT EN") || data.message_ia.includes("VICTOIRE")) {
+                    document.getElementById('ia-msg').style.color = "#e94560"; 
+                }
             }
         }
 
         function exitPaintMode() {
             paintMode = false;
-            $("paint-controls").style.display = "none";
-            $("game-area").style.display = "none";
-            $("menu").style.display = "block";
-            $("btn-start-game").innerText = "JOUER SUR CE PLATEAU";
-            $("btn-start-game").style.backgroundColor = "#27ae60";
-            updateModeSettings();
-        }
-
-        async function runAiTurn(color) {
-            isAiThinking = true;
-            $("ia-msg").innerText = "";
-            $("ia-msg").style.color = "#00ff88";
-            turnUi(`${labelFor(color)} analyse...`);
-            startProgressBar();
-            try {
-                const data = await fetchJson("/play", { action: "ia", color: colorToInt(color) });
-                applyGameState(data);
-                if (data.message_ia) {
-                    $("ia-msg").innerText = data.message_ia;
-                    const lower = data.message_ia.toLowerCase();
-                    $("ia-msg").style.color = lower.includes("defaite") || lower.includes("mat") ? "#e94560" : "#00ff88";
-                }
-                return data;
-            } finally {
-                stopProgressBar();
-                isAiThinking = false;
-            }
-        }
-
-        async function autoLoop() {
-            while (!jeuTermine && controllerFor(currentColorTurn) === "ia") {
-                const data = await runAiTurn(currentColorTurn);
-                if (!data.played) { $("status").innerText = "L'IA n'a pas pu jouer."; return; }
-                if (data.partie_terminee) { handleWin(data); return; }
-                currentColorTurn = data.next_color || toggleColor(currentColorTurn);
-                turnUi();
-                if (gameMode !== "iavia") return;
-                await sleep(250);
-            }
-        }
-
-        async function startGame() {
-            await prepareGameArea();
-            updateModeSettings();
-            if (!customBoardActive) {
-                configureParticipants();
-                await fetchJson("/reset");
-                drawBoard(emptyGrid());
-            } else {
-                gameMode = getSelectedMode();
-                humanColor = gameMode === "pvia" ? $("paint-human-color").value : "rouge";
-                currentColorTurn = $("paint-next-turn").value;
-                updatePlayerLabels();
-                applyGameState(await fetchJson("/play", { action: "get_grid" }));
-                customBoardActive = false;
-                $("btn-start-game").innerText = "NOUVELLE PARTIE";
-                $("btn-start-game").style.backgroundColor = "#e94560";
-            }
-            startTimers();
-            turnUi();
-            if (controllerFor(currentColorTurn) === "ia") await autoLoop();
-        }
-
-        async function importGame() {
-            const file = $("import-file");
-            let sequence = $("import-string").value.trim();
-            if (file.files.length > 0) sequence = (await file.files[0].text()).replace(/\s+/g, "");
-            if (sequence === "") { await startGame(); return; }
-            if (!/^[1-9]+$/.test(sequence)) { alert("Format invalide. Utilisez uniquement des chiffres de 1 a 9."); return; }
-            await prepareGameArea();
-            configureParticipants();
-            await fetchJson("/reset");
-            drawBoard(emptyGrid());
-            let data = null;
-            for (let i = 0; i < sequence.length; i++) {
-                data = await fetchJson("/play", { action: "human", colonne: parseInt(sequence[i], 10) - 1, color: i % 2 === 0 ? 1 : 2 });
-                if (!data.played) { alert("La sequence importee contient au moins un coup impossible."); break; }
-                if (data.partie_terminee) break;
-            }
-            if (!data) return;
-            applyGameState(data);
-            if (!data.played && !data.partie_terminee) return;
-            if (data.partie_terminee) { handleWin(data); return; }
-            currentColorTurn = data.next_color || "rouge";
-            startTimers();
-            turnUi();
-            if (controllerFor(currentColorTurn) === "ia") await autoLoop();
+            document.getElementById('paint-controls').style.display = 'none';
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
+            document.getElementById('btn-start-game').innerText = "🖌️ JOUER SUR LE PLATEAU PEINT";
+            document.getElementById('btn-start-game').style.backgroundColor = "#27ae60";
         }
 
         async function undoMove() {
-            if (paintMode || isAiThinking) return;
-            const data = await fetchJson("/undo", { steps: gameMode === "pvp" ? 1 : 2 });
-            applyGameState(data);
-            $("ia-msg").innerText = "";
+            if (jeuTermine) jeuTermine = false;
+            if (isAiThinking) return; 
+
+            const res = await fetch('/undo', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({tab_id: TAB_ID})
+            });
+            const data = await res.json();
+            if(data.grille) {
+                // 🔥 CORRECTION ICI : data.winning_cells
+                drawBoard(data.grille, data.winning_cells || []);
+                document.getElementById('ia-msg').innerText = "Coup(s) annulé(s).";
+                checkNextTurn(); 
+            }
+        }
+
+        function startProgressBar() {
+            document.getElementById('progress-container').style.display = 'block';
+            document.getElementById('progress-bar').style.width = '0%';
+            let startTime = Date.now();
+            
+            aiPollingInterval = setInterval(async () => {
+                let elapsed = Date.now() - startTime;
+                let percent = Math.min((elapsed / 14000) * 100, 100);
+                document.getElementById('progress-bar').style.width = percent + '%';
+                
+                try {
+                    let res = await fetch('/status_ia');
+                    let data = await res.json();
+                    if(data.profondeur > 0 && document.getElementById('ia-msg').innerText === "") {
+                        document.getElementById('ia-msg').innerText = "🤖 Profondeur explorée : " + data.profondeur + " ...";
+                    }
+                } catch(e) {}
+            }, 400); 
+        }
+
+        function stopProgressBar() {
+            clearInterval(aiPollingInterval);
+            document.getElementById('progress-bar').style.width = '100%';
+            setTimeout(() => { document.getElementById('progress-container').style.display = 'none'; }, 400);
+        }
+
+        async function importGame() {
+            const fileInput = document.getElementById('import-file');
+            let importStr = document.getElementById('import-string').value.trim();
+            
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const text = await file.text();
+                importStr = text.replace(/\s+/g, '');
+            }
+            
+            if (importStr === "") { startGame(); return; }
+            if (!/^[1-9]+$/.test(importStr)) { alert("Format invalide ! Saisissez des chiffres ou importez un fichier .txt."); return; }
+
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('live-controls').style.display = 'flex';
+            document.getElementById('timers').style.display = 'flex';
+            
+            timeRed = 600; timeYellow = 600; updateTimersDisplay();
+            previousGrille = null;
+            
+            const starter = document.getElementById('select-starter').value;
+            document.getElementById('live-red-type').value = (starter === 'ia') ? 'ia' : 'human';
+            document.getElementById('live-yellow-type').value = (starter === 'ia') ? 'human' : 'ia';
+
+            document.getElementById('status').innerText = "Importation...";
+            await fetch('/reset', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({tab_id: TAB_ID}) });
+            
+            let lastData = null; let isWin = false; let validMoves = 0;
+
+            for (let i = 0; i < importStr.length; i++) {
+                let col = parseInt(importStr[i]) - 1; 
+                const currentImportColor = (i % 2 === 0) ? 1 : 2;
+                const res = await fetch('/play', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'human', colonne: col, color: currentImportColor, tab_id: TAB_ID }) });
+                lastData = await res.json();
+                validMoves++;
+                if (lastData.vainqueur) { isWin = true; break; }
+            }
+            // 🔥 CORRECTION ICI : lastData.winning_cells
+            drawBoard(lastData.grille, lastData.winning_cells || []);
+            if (isWin) { handleWin(lastData.vainqueur); return; }
+
+            currentColorTurn = (validMoves % 2 === 0) ? 'rouge' : 'jaune';
             jeuTermine = false;
-            currentColorTurn = data.next_color || "rouge";
-            turnUi("Coup annule.");
-            if (controllerFor(currentColorTurn) === "ia") await autoLoop();
+
+            switchTimer(currentColorTurn);
+            startTimers();
+            checkNextTurn();
         }
 
-        async function abandonGame() {
-            if (jeuTermine || paintMode || isAiThinking) return;
-            const data = await fetchJson("/abandon", { mode: gameMode, color: colorToInt(currentColorTurn), human_color: humanColor });
-            $("ia-msg").innerText = `${labelFor(currentColorTurn)} abandonne la partie.`;
-            handleWin(data);
+        async function startGame() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('paint-controls').style.display = 'none';
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('live-controls').style.display = 'flex';
+            document.getElementById('timers').style.display = 'flex';
+            document.getElementById('ia-msg').innerText = "";
+            paintMode = false;
+            
+            timeRed = 600; timeYellow = 600; updateTimersDisplay();
+            previousGrille = null; 
+            
+            if (!customBoardActive) {
+                const starter = document.getElementById('select-starter').value;
+                document.getElementById('live-red-type').value = (starter === 'ia') ? 'ia' : 'human';
+                document.getElementById('live-yellow-type').value = (starter === 'ia') ? 'human' : 'ia';
+                currentColorTurn = 'rouge'; 
+
+                await fetch('/reset', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({tab_id: TAB_ID}) });
+                drawBoard(Array(9).fill().map(()=>Array(9).fill(0)), []); 
+                startTimers();
+                switchTimer('rouge'); 
+                checkNextTurn();
+            } else {
+                let p_humanColor = document.getElementById('paint-human-color').value;
+                currentColorTurn = document.getElementById('paint-next-turn').value;
+                
+                document.getElementById('live-red-type').value = (p_humanColor === 'rouge') ? 'human' : 'ia';
+                document.getElementById('live-yellow-type').value = (p_humanColor === 'jaune') ? 'human' : 'ia';
+                
+                const res = await fetch('/play', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'get_grid', tab_id: TAB_ID }) });
+                const data = await res.json();
+                // 🔥 CORRECTION ICI : data.winning_cells
+                drawBoard(data.grille, data.winning_cells || []);
+                
+                customBoardActive = false; 
+                document.getElementById('btn-start-game').innerText = "NOUVELLE PARTIE";
+                document.getElementById('btn-start-game').style.backgroundColor = "#e94560";
+                
+                startTimers();
+                switchTimer(currentColorTurn);
+                checkNextTurn();
+            }
         }
 
-        async function playMove(col) {
-            if (jeuTermine || paintMode || isAiThinking || controllerFor(currentColorTurn) !== "human") return;
-            $("ia-msg").innerText = "";
-            const data = await fetchJson("/play", { action: "human", colonne: col, color: colorToInt(currentColorTurn) });
-            if (!data.played) return;
-            applyGameState(data);
-            if (data.partie_terminee) { handleWin(data); return; }
-            currentColorTurn = data.next_color || toggleColor(currentColorTurn);
-            turnUi();
-            if (controllerFor(currentColorTurn) === "ia") await autoLoop();
+        async function declencherIA() {
+            isAiThinking = true;  
+            document.getElementById('ia-msg').innerText = ""; 
+            startProgressBar(); 
+            
+            const colorInt = (currentColorTurn === 'rouge') ? 1 : 2;
+            
+            const res = await fetch('/play', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'ia', color: colorInt, tab_id: TAB_ID }) 
+            });
+            const iaData = await res.json();
+            
+            stopProgressBar();
+            // 🔥 CORRECTION ICI : iaData.winning_cells
+            drawBoard(iaData.grille, iaData.winning_cells || []); 
+
+            if (iaData.message_ia) {
+                document.getElementById('ia-msg').innerText = iaData.message_ia;
+                if (iaData.message_ia.includes("MAT EN") || iaData.message_ia.includes("VICTOIRE") || iaData.message_ia.includes("défaite")) {
+                    document.getElementById('ia-msg').style.color = "#e94560"; 
+                } else {
+                    document.getElementById('ia-msg').style.color = "#00ff88"; 
+                }
+            }
+
+            isAiThinking = false; 
+
+            if (iaData.vainqueur) {
+                handleWin(iaData.vainqueur);
+            } else {
+                currentColorTurn = (currentColorTurn === 'rouge') ? 'jaune' : 'rouge';
+                switchTimer(currentColorTurn); 
+                checkNextTurn(); 
+            }
         }
 
-        function onImportFileSelected() {
-            $("file-upload-label").innerText = $("import-file").files.length > 0 ? `Fichier pret : ${$("import-file").files[0].name}` : "Parcourir un fichier...";
+        function handleWin(vainqueur) {
+            document.getElementById('status').innerText = vainqueur === "Nul" ? "Match Nul !" : "👑 Victoire de " + vainqueur;
+            document.getElementById('status').style.color = vainqueur === "Nul" ? "#ffcc00" : "#00ff88";
+            document.getElementById('board').setAttribute('data-hover', 'none'); 
+            setBoardNeon('neutre');
+            jeuTermine = true;
+            clearInterval(timerInterval);
         }
 
-        window.addEventListener("load", () => {
-            updateModeSettings();
-            updatePlayerLabels();
-            updateTimersDisplay();
-            drawBoard(emptyGrid());
-            switchTimer("rouge");
-            updateAbandonButton();
-        });
+        async function playMove(c) {
+            let currentType = (currentColorTurn === 'rouge') ? document.getElementById('live-red-type').value : document.getElementById('live-yellow-type').value;
+            if (jeuTermine || currentType === 'ia' || isAiThinking || paintMode) return;
+            
+            document.getElementById('ia-msg').innerText = ""; 
+            const colorInt = (currentColorTurn === 'rouge') ? 1 : 2;
+            
+            const res = await fetch('/play', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'human', colonne: c, color: colorInt, tab_id: TAB_ID }) 
+            });
+            const humanData = await res.json();
+            
+            // 🔥 CORRECTION ICI : humanData.winning_cells
+            drawBoard(humanData.grille, humanData.winning_cells || []); 
+
+            if (humanData.vainqueur) { 
+                handleWin(humanData.vainqueur); 
+                return; 
+            }
+
+            currentColorTurn = (currentColorTurn === 'rouge') ? 'jaune' : 'rouge';
+            switchTimer(currentColorTurn); 
+            checkNextTurn(); 
+        }
     </script>
 </body>
 </html>
