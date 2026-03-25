@@ -2,498 +2,517 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Puissance 4</title>
+    <title>Terminator P4</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #121212; color: #ffffff; margin: 0; padding: 20px;}
-        h1 { color: #e94560; text-transform: uppercase; letter-spacing: 2px; }
-        
-        #menu { 
-            background-color: #1f1f2e; padding: 30px; border-radius: 15px; width: 400px; margin: 50px auto; 
-            border: 2px solid rgba(233, 69, 96, 0.5);
-            box-shadow: 0 0 20px rgba(233, 69, 96, 0.4), inset 0 0 10px rgba(233, 69, 96, 0.2); 
+        :root { --bg:#121212; --panel:#1f1f2e; --soft:#0d0d16; --red:#e94560; --yellow:#f9a826; --green:#00ff88; --muted:#a0a0a0; }
+        body { font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; text-align:center; background:var(--bg); color:#fff; margin:0; padding:20px; }
+        h1 { color:var(--red); text-transform:uppercase; letter-spacing:2px; }
+        #menu { background:var(--panel); padding:28px; border-radius:15px; width:min(430px,calc(100vw - 40px)); margin:40px auto; border:2px solid rgba(233,69,96,.45); box-shadow:0 0 20px rgba(233,69,96,.3), inset 0 0 10px rgba(233,69,96,.16); box-sizing:border-box; }
+        .menu-group { margin-bottom:16px; }
+        label { display:block; margin-bottom:6px; color:var(--muted); font-weight:700; }
+        select, input[type="text"] { width:100%; padding:10px; border:1px solid var(--red); border-radius:6px; background:var(--soft); color:#fff; box-sizing:border-box; text-align:center; }
+        .btn { width:100%; border:0; border-radius:7px; background:var(--red); color:#fff; padding:13px 16px; font-weight:700; cursor:pointer; transition:.2s; }
+        .btn:hover { background:#ff5c77; box-shadow:0 0 14px rgba(233,69,96,.75); }
+        .mode-help { color:var(--muted); font-size:.92em; line-height:1.45; margin:-2px 0 14px; min-height:42px; }
+        #timers { display:none; justify-content:center; gap:20px; margin-bottom:20px; flex-wrap:wrap; }
+        .timer-box { min-width:220px; padding:10px 22px; border-radius:10px; background:var(--panel); border:2px solid transparent; font-size:1.25em; font-weight:700; transition:.25s; }
+        .timer-red { color:var(--red); } .timer-yellow { color:var(--yellow); } .active-turn { border-color:#fff; box-shadow:0 0 18px rgba(255,255,255,.28); transform:scale(1.03); }
+        .file-upload-wrapper { position:relative; overflow:hidden; width:100%; }
+        .file-upload-wrapper input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+        .file-upload-btn { display:block; width:100%; padding:10px; background:var(--soft); color:var(--muted); border:1px solid var(--red); border-radius:6px; box-sizing:border-box; }
+        #game-area { display:none; }
+        #live-controls, #paint-controls { display:none; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap; width:fit-content; max-width:calc(100vw - 30px); margin:0 auto 18px; padding:14px; border-radius:10px; background:var(--panel); }
+        #status { min-height:28px; margin-bottom:6px; color:var(--yellow); font-weight:700; font-size:1.1em; }
+        #ia-msg { min-height:24px; margin-bottom:14px; color:var(--green); font-weight:700; }
+        .board { display:grid; grid-template-columns:repeat(9,55px); gap:8px; justify-content:center; width:fit-content; margin:0 auto; padding:15px 15px 5px; border-radius:15px; background:var(--panel); border:2px solid transparent; transition:.3s; }
+        .board.neon-rouge { border-color:rgba(233,69,96,.8); box-shadow:0 0 25px rgba(233,69,96,.45), inset 0 0 15px rgba(233,69,96,.25); }
+        .board.neon-jaune { border-color:rgba(249,168,38,.8); box-shadow:0 0 25px rgba(249,168,38,.45), inset 0 0 15px rgba(249,168,38,.25); }
+        .board.neon-neutre { border-color:rgba(0,255,136,.8); box-shadow:0 0 25px rgba(0,255,136,.4), inset 0 0 15px rgba(0,255,136,.18); }
+        .cell { position:relative; width:55px; height:55px; border-radius:50%; background:var(--soft); cursor:pointer; box-shadow:inset 0 5px 10px rgba(0,0,0,.8); }
+        .cell.rouge { background:var(--red); box-shadow:inset 0 -5px 15px rgba(0,0,0,.4), 0 0 10px rgba(233,69,96,.55); cursor:default; }
+        .cell.jaune { background:var(--yellow); box-shadow:inset 0 -5px 15px rgba(0,0,0,.4), 0 0 10px rgba(249,168,38,.55); cursor:default; }
+        .cell.winning-halo { z-index:2; }
+        .cell.winning-halo::before { content:""; position:absolute; inset:-6px; border-radius:50%; border:3px solid rgba(0,255,136,.98); box-shadow:0 0 10px rgba(0,255,136,.75), 0 0 24px rgba(0,255,136,.85), inset 0 0 10px rgba(0,255,136,.35); animation:winningPulse .75s ease-in-out infinite alternate; pointer-events:none; }
+        .board[data-hover="rouge"] .cell:not(.rouge):not(.jaune):hover { background:rgba(233,69,96,.2); }
+        .board[data-hover="jaune"] .cell:not(.rouge):not(.jaune):hover { background:rgba(249,168,38,.2); }
+        .cell.last-move::after { content:""; position:absolute; inset:50% auto auto 50%; width:14px; height:14px; transform:translate(-50%,-50%); border-radius:50%; background:rgba(255,255,255,.95); box-shadow:0 0 10px #fff; }
+        .col-number { width:55px; height:24px; line-height:24px; font-size:.88em; font-weight:700; color:#7a7a8c; }
+        #progress-container { display:none; width:min(410px,calc(100vw - 40px)); height:20px; margin:0 auto 18px; overflow:hidden; border-radius:20px; background:#2a2a35; }
+        #progress-bar { width:0%; height:100%; background:linear-gradient(90deg,var(--yellow),#ffcc70); transition:width .3s linear; }
+        .inline-group { display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
+        @keyframes winningPulse {
+            0% { transform:scale(0.98); opacity:.78; box-shadow:0 0 8px rgba(0,255,136,.6), 0 0 18px rgba(0,255,136,.72), inset 0 0 8px rgba(0,255,136,.3); }
+            100% { transform:scale(1.06); opacity:1; box-shadow:0 0 14px rgba(0,255,136,.96), 0 0 30px rgba(0,255,136,1), inset 0 0 12px rgba(0,255,136,.45); }
         }
-        
-        .menu-group { margin-bottom: 20px; text-align: left; transition: all 0.3s ease; }
-        label { display: block; margin-bottom: 5px; color: #a0a0a0; font-weight: bold; text-align: center; }
-        
-        select, input[type="range"], input[type="text"] { 
-            width: 100%; padding: 10px; background-color: #0d0d16; color: white; border: 1px solid #e94560; 
-            border-radius: 5px; text-align: center; text-align-last: center; font-size: 1em; cursor: pointer; box-sizing: border-box;
-        }
-        input[type="text"] { cursor: text; text-align-last: auto; }
-        input[type="text"]:focus { outline: none; box-shadow: 0 0 10px rgba(233, 69, 96, 0.5); }
-        
-        select option { text-align: center; }
-
-        .btn { background-color: #e94560; color: white; border: none; padding: 15px 20px; font-size: 1.1em; font-weight: bold; border-radius: 5px; cursor: pointer; width: 100%; transition: 0.3s;}
-        .btn:hover { background-color: #ff5c77; box-shadow: 0 0 15px #e94560; }
-        
-        /* CONTRÔLES EN DIRECT (Rendu flexible) */
-        #live-controls { display: none; background-color: #1f1f2e; padding: 15px; border-radius: 10px; width: max-content; margin: 0 auto 20px auto; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: center;}
-        
-        #game-area { display: none; }
-        #status { font-size: 1.2em; margin-bottom: 15px; color: #f9a826; font-weight: bold; height: 30px;}
-        
-        .board { 
-            display: grid; grid-template-columns: repeat(9, 55px); gap: 8px; justify-content: center; 
-            background-color: #1f1f2e; padding: 15px 15px 5px 15px; border-radius: 15px; 
-            width: max-content; margin: 0 auto; 
-            border: 2px solid transparent;
-            transition: box-shadow 0.4s ease, border-color 0.4s ease;
-        }
-        
-        /* LUEURS DYNAMIQUES ECTO */
-        .board.neon-rouge {
-            border-color: rgba(255, 255, 255, 0.5);
-            animation: ecto-glow-rouge 1.5s ease-in-out infinite alternate;
-        }
-        @keyframes ecto-glow-rouge {
-            from { box-shadow: 0 0 5px #fff, 0 0 10px #e94560, 0 0 15px #e94560, inset 0 0 10px #e94560; }
-            to { box-shadow: 0 0 8px #fff, 0 0 15px #e94560, 0 0 25px #e94560, 0 0 35px rgba(233, 69, 96, 0.6), inset 0 0 15px #e94560; }
-        }
-
-        .board.neon-jaune {
-            border-color: rgba(255, 255, 255, 0.5);
-            animation: ecto-glow-jaune 1.5s ease-in-out infinite alternate;
-        }
-        @keyframes ecto-glow-jaune {
-            from { box-shadow: 0 0 5px #fff, 0 0 10px #f9a826, 0 0 15px #f9a826, inset 0 0 10px #f9a826; }
-            to { box-shadow: 0 0 8px #fff, 0 0 15px #f9a826, 0 0 25px #f9a826, 0 0 35px rgba(249, 168, 38, 0.6), inset 0 0 15px #f9a826; }
-        }
-
-        .board.neon-neutre { 
-            border-color: rgba(255, 255, 255, 0.5);
-            animation: ecto-glow-vert 1.5s ease-in-out infinite alternate;
-        }
-        @keyframes ecto-glow-vert {
-            from { box-shadow: 0 0 5px #fff, 0 0 10px #00ff88, 0 0 15px #00ff88, inset 0 0 10px #00ff88; }
-            to { box-shadow: 0 0 8px #fff, 0 0 15px #00ff88, 0 0 25px #00ff88, 0 0 35px rgba(0, 255, 136, 0.6), inset 0 0 15px #00ff88; }
-        }
-        
-        .cell { position: relative; width: 55px; height: 55px; background-color: #0d0d16; border-radius: 50%; cursor: pointer; transition: 0.3s; box-shadow: inset 0 5px 10px rgba(0,0,0,0.8); }
-        .cell.rouge { background-color: #e94560; box-shadow: inset 0 -5px 15px rgba(0,0,0,0.4), 0 0 10px rgba(233, 69, 96, 0.6); cursor: default; }
-        .cell.jaune { background-color: #f9a826; box-shadow: inset 0 -5px 15px rgba(0,0,0,0.4), 0 0 10px rgba(249, 168, 38, 0.6); cursor: default; }
-
-        .board[data-hover="rouge"] .cell:not(.rouge):not(.jaune):hover { background-color: rgba(233, 69, 96, 0.2); }
-        .board[data-hover="jaune"] .cell:not(.rouge):not(.jaune):hover { background-color: rgba(249, 168, 38, 0.2); }
-        
-        .cell.last-move::after {
-            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 15px; height: 15px; background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 50%; box-shadow: 0 0 10px white; pointer-events: none;
-        }
-
-        .cell.winning-cell {
-            animation: pulseWin 0.8s infinite alternate;
-            border: 4px solid #00ff88; box-sizing: border-box;
-        }
-        @keyframes pulseWin {
-            from { box-shadow: 0 0 10px #00ff88, inset 0 0 10px #00ff88; filter: brightness(1); }
-            to { box-shadow: 0 0 25px #00ff88, inset 0 0 20px #00ff88; filter: brightness(1.3); }
-        }
-
-        .col-number { width: 55px; height: 25px; line-height: 25px; text-align: center; font-weight: bold; color: #7a7a8c; font-size: 0.9em; cursor: default; }
-
-        #progress-container { width: 400px; background-color: #2a2a35; border-radius: 20px; margin: 0 auto 20px auto; height: 20px; display: none; overflow: hidden; position: relative;}
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #f9a826, #ffcc70); transition: width 0.1s linear;}
+        @media (max-width:760px) { .board { grid-template-columns:repeat(9,34px); gap:5px; padding:10px 10px 4px; } .cell,.col-number { width:34px; } .cell { height:34px; } .col-number { height:20px; line-height:20px; font-size:.8em; } }
     </style>
 </head>
 <body>
+    <h1>Puissance 4 - Terminator</h1>
 
-    <h1>Puissance 4</h1>
+    <div id="timers">
+        <div id="box-red" class="timer-box timer-red">Rouge<br><span id="label-red">Joueur Rouge</span><br><span id="time-red">10:00</span></div>
+        <div id="box-yellow" class="timer-box timer-yellow">Jaune<br><span id="label-yellow">Joueur Jaune</span><br><span id="time-yellow">10:00</span></div>
+    </div>
 
     <div id="menu">
-        <h2>Configuration du Match</h2>
+        <h2>Configuration du match</h2>
         <div class="menu-group">
-            <label>Mode de Jeu Initial</label>
-            <select id="select-mode">
-                <option value="pvia">🔴・Joueur VS IA・🟡</option>
-                <option value="pvp">🔴・Joueur VS Joueur・🟡</option>
-                <option value="iavia">🔴・IA VS IA・🟡</option>
+            <label for="select-mode">Mode de jeu</label>
+            <select id="select-mode" onchange="updateModeSettings()">
+                <option value="pvia">Joueur vs IA</option>
+                <option value="pvp">Humain vs Humain</option>
+                <option value="iavia">IA vs IA</option>
             </select>
         </div>
-        
-        <div id="ia-settings">
-            <div class="menu-group" id="starter-group">
-                <label>Qui commence ?</label>
-                <select id="select-starter">
-                    <option value="human">👤 Vous commencez (Rouges)</option>
-                    <option value="ia">🤖 L'IA commence (Rouges)</option>
-                </select>
-            </div>
-            <div class="menu-group">
-                <label>Comportement de l'IA</label>
-                <select id="select-ia-type">
-                    <option value="minimax">🗿 Terminator (Minimax BDD)</option>
-                    <option value="random">🤓 Noob (Aléatoire)</option>
-                </select>
-            </div>
+        <div id="mode-help" class="mode-help"></div>
+        <div class="menu-group" id="starter-group">
+            <label for="select-starter">Qui commence ?</label>
+            <select id="select-starter">
+                <option value="human">Vous commencez (Rouges)</option>
+                <option value="ia">L'IA commence (Rouges)</option>
+            </select>
         </div>
-        <button class="btn" onclick="startGame()">NOUVELLE PARTIE</button>
-
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(233, 69, 96, 0.3);">
-            <h3 style="color: #a0a0a0; font-size: 1em; margin-bottom: 15px; text-transform: uppercase;">Importer une partie</h3>
+        <button id="btn-start-game" class="btn" onclick="startGame()">NOUVELLE PARTIE</button>
+        <button class="btn" style="background:#8e44ad; margin-top:14px;" onclick="enterPaintMode()">CREER UN PLATEAU SUR MESURE</button>
+        <div style="margin-top:26px; padding-top:18px; border-top:1px solid rgba(233,69,96,.3);">
+            <h3 style="color:var(--muted); font-size:1em; margin-bottom:14px; text-transform:uppercase;">Importer une partie</h3>
             <div class="menu-group">
-                <label>Séquence texte (ex: 44455)</label>
+                <label for="import-string">1. Sequence texte (ex: 44455)</label>
                 <input type="text" id="import-string" placeholder="Saisir les colonnes">
             </div>
             <div class="menu-group">
-                <label>Ou fichier texte (.txt)</label>
-                <input type="file" id="import-file" accept=".txt" style="background-color: #0d0d16; color: #a0a0a0; padding: 8px; border: 1px solid #e94560; border-radius: 5px; width: 100%; box-sizing: border-box; font-size: 0.9em; cursor: pointer;">
+                <label for="import-file">2. Ou importer un fichier texte (.txt)</label>
+                <div class="file-upload-wrapper">
+                    <span class="file-upload-btn" id="file-upload-label">Parcourir un fichier...</span>
+                    <input type="file" id="import-file" accept=".txt" onchange="onImportFileSelected()">
+                </div>
             </div>
-            <button class="btn" style="background-color: #f9a826; box-shadow: 0 0 10px rgba(249, 168, 38, 0.4); color:#121212; margin-top: 5px;" onclick="importGame()">IMPORTER ET REPRENDRE</button>
-        </div>
-
-        <div style="margin-top: 25px; font-size: 0.85em; color: #7a7a8c; font-weight: bold; letter-spacing: 1px;">
-            Fait par Benoît TRUONG & Vesagatheepan SIVARAJAH
+            <button class="btn" style="background:var(--yellow); color:#121212;" onclick="importGame()">IMPORTER ET REPRENDRE</button>
         </div>
     </div>
 
     <div id="game-area">
-        <div id="live-controls">
-            
-            <div style="background-color: #0d0d16; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; gap: 15px; align-items: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);">
-                <div style="color: #e94560; font-weight: bold; text-shadow: 0 0 5px rgba(233,69,96,0.5);">
-                    🔴
-                    <select id="live-red-mode" onchange="checkTurnAndPlay()" style="width: auto; padding: 5px; font-size: 0.9em; margin-left: 5px; border-color: #e94560; background-color: #1a1a2e;">
-                        <option value="human">👤 Humain</option>
-                        <option value="ia">🤖 IA</option>
-                    </select>
-                </div>
-                <div style="color: #f9a826; font-weight: bold; text-shadow: 0 0 5px rgba(249,168,38,0.5);">
-                    🟡
-                    <select id="live-yellow-mode" onchange="checkTurnAndPlay()" style="width: auto; padding: 5px; font-size: 0.9em; margin-left: 5px; border-color: #f9a826; background-color: #1a1a2e;">
-                        <option value="human">👤 Humain</option>
-                        <option value="ia">🤖 IA</option>
-                    </select>
-                </div>
+        <div id="paint-controls">
+            <div class="inline-group">
+                <label style="margin:0; color:#fff;">Pinceau :</label>
+                <select id="paint-color-select" style="width:auto; padding:5px;" onchange="paintColor = parseInt(this.value, 10)">
+                    <option value="1">Poser pion rouge</option>
+                    <option value="2">Poser pion jaune</option>
+                    <option value="0">Gomme</option>
+                </select>
             </div>
-
-            <div id="live-ia-controls" style="display: flex; flex-direction: column; align-items: center;">
-                <label style="margin: 0; font-size: 0.8em; text-transform: uppercase;">Profondeur IA: <span id="live-depth-val">6</span></label>
-                <input type="range" id="live-depth" min="1" max="7" value="6" oninput="document.getElementById('live-depth-val').innerText = this.value;" style="width: 120px;">
+            <div id="paint-human-color-group" class="inline-group" style="border-left:2px solid #555; padding-left:12px;">
+                <label style="margin:0; color:#fff;">Humain :</label>
+                <select id="paint-human-color" style="width:auto; padding:5px;">
+                    <option value="rouge">L'humain est Rouge</option>
+                    <option value="jaune">L'humain est Jaune</option>
+                </select>
             </div>
-
-            <button id="btn-pause" class="btn" style="padding: 10px 15px; width: auto; background-color: #e94560; box-shadow: 0 0 10px #e94560; border: none;" onclick="togglePause()">⏸️ Pause</button>
-            <button class="btn" style="padding: 10px 15px; width: auto; background-color: #555; box-shadow: 0 0 10px #555; border:none;" onclick="location.reload()">Quitter</button>
+            <div class="inline-group" style="border-left:2px solid #555; padding-left:12px;">
+                <label style="margin:0; color:#fff;">Prochain tour :</label>
+                <select id="paint-next-turn" style="width:auto; padding:5px;">
+                    <option value="rouge">Rouge joue</option>
+                    <option value="jaune">Jaune joue</option>
+                </select>
+            </div>
+            <div class="inline-group" style="width:100%;">
+                <button class="btn" style="width:auto; background:#3498db; padding:8px 14px;" onclick="analyzeBoard()">ANALYSER (IA)</button>
+                <button class="btn" style="width:auto; background:#27ae60; padding:8px 14px;" onclick="exitPaintMode()">VALIDER LE PLATEAU</button>
+                <button class="btn" style="width:auto; background:#555; padding:8px 14px;" onclick="location.reload()">QUITTER</button>
+            </div>
         </div>
 
-        <div id="status">Préparation de la grille...</div>
+        <div id="live-controls">
+            <button class="btn" style="width:auto; padding:10px; background:#d9534f;" onclick="undoMove()">Annuler</button>
+            <button id="btn-abandon" class="btn" style="width:auto; padding:10px; background:#c0392b;" onclick="abandonGame()">Abandonner</button>
+            <button class="btn" style="width:auto; padding:10px; background:var(--yellow); color:#000;" onclick="location.reload()">Recommencer</button>
+            <button class="btn" style="width:auto; padding:10px; background:#555;" onclick="location.reload()">Quitter</button>
+        </div>
+
+        <div id="status">Preparation de la grille...</div>
+        <div id="ia-msg"></div>
         <div id="progress-container"><div id="progress-bar"></div></div>
-        
-        <div class="board neon-rouge" id="board" data-hover="rouge"></div>
+        <div id="board" class="board neon-rouge" data-hover="rouge"></div>
     </div>
 
     <script>
-        const lignes = 9;
-        const colonnes = 9;
-        let jeuTermine = false;
-        let iaPaused = false;
-        let progressInterval;
-        let currentHoverColor = 'rouge'; 
-        let previousGrille = null;
+        const lignes = 9, colonnes = 9, $ = (id) => document.getElementById(id);
+        let jeuTermine = false, isAiThinking = false, currentColorTurn = "rouge", humanColor = "rouge", gameMode = "pvia";
+        let paintMode = false, paintColor = 1, previousGrille = null, customBoardActive = false, winningCells = [];
+        let timeRed = 600, timeYellow = 600, timerInterval = null, aiPollingInterval = null;
 
-        // --- GESTION VISUELLE ---
+        const emptyGrid = () => Array.from({ length: lignes }, () => Array(colonnes).fill(0));
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        const toggleColor = (color) => color === "rouge" ? "jaune" : "rouge";
+        const colorToInt = (color) => color === "rouge" ? 1 : 2;
+        const getSelectedMode = () => $("select-mode").value;
+        const fetchJson = async (url, payload) => (await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: payload ? JSON.stringify(payload) : null })).json();
+
+        function controllerFor(color) {
+            if (gameMode === "pvp") return "human";
+            if (gameMode === "iavia") return "ia";
+            return color === humanColor ? "human" : "ia";
+        }
+
+        function labelFor(color) {
+            if (gameMode === "pvp") return color === "rouge" ? "Joueur Rouge" : "Joueur Jaune";
+            if (gameMode === "iavia") return color === "rouge" ? "IA Rouge" : "IA Jaune";
+            return controllerFor(color) === "human" ? "Vous" : "IA Terminator";
+        }
+
+        function updatePlayerLabels() {
+            if (gameMode === "pvp") {
+                $("label-red").innerText = "Joueur Rouge";
+                $("label-yellow").innerText = "Joueur Jaune";
+            } else if (gameMode === "iavia") {
+                $("label-red").innerText = "IA Rouge";
+                $("label-yellow").innerText = "IA Jaune";
+            } else {
+                $("label-red").innerText = humanColor === "rouge" ? "Vous (Humain)" : "IA Terminator";
+                $("label-yellow").innerText = humanColor === "jaune" ? "Vous (Humain)" : "IA Terminator";
+            }
+        }
+
+        function updateModeSettings() {
+            gameMode = getSelectedMode();
+            $("starter-group").style.display = gameMode === "pvia" ? "block" : "none";
+            $("paint-human-color-group").style.display = gameMode === "pvia" ? "flex" : "none";
+            $("mode-help").innerText = gameMode === "pvp"
+                ? "Deux humains jouent sur la meme grille, chacun son tour."
+                : gameMode === "iavia"
+                    ? "Les deux couleurs sont pilotees par l'IA pour lancer un duel automatique."
+                    : "Vous pouvez jouer contre l'IA, choisir qui commence et reprendre sur un plateau personnalise.";
+        }
+
+        function updateTimersDisplay() {
+            const fmt = (t) => `${Math.floor(t / 60)}:${t % 60 < 10 ? "0" : ""}${t % 60}`;
+            $("time-red").innerText = fmt(timeRed);
+            $("time-yellow").innerText = fmt(timeYellow);
+        }
+
         function setBoardNeon(color) {
-            const board = document.getElementById('board');
-            board.classList.remove('neon-rouge', 'neon-jaune', 'neon-neutre');
-            if(color === 'rouge') board.classList.add('neon-rouge');
-            else if(color === 'jaune') board.classList.add('neon-jaune');
-            else board.classList.add('neon-neutre');
+            $("board").classList.remove("neon-rouge", "neon-jaune", "neon-neutre");
+            $("board").classList.add(color === "rouge" ? "neon-rouge" : color === "jaune" ? "neon-jaune" : "neon-neutre");
         }
 
-        document.getElementById('select-mode').addEventListener('change', function() {
-            const iaSettings = document.getElementById('ia-settings');
-            const starterGroup = document.getElementById('starter-group');
-            if (this.value === 'pvp') {
-                iaSettings.style.display = 'none'; 
-            } else {
-                iaSettings.style.display = 'block'; 
-                if (this.value === 'iavia') starterGroup.style.display = 'none';
-                else starterGroup.style.display = 'block';
-            }
-        });
-
-        // --- LOGIQUE DE JEU UNIFIÉE ---
-        
-        // Initialise les dropdowns en jeu en fonction du menu principal
-        function applyMenuToToggles() {
-            const mode = document.getElementById('select-mode').value;
-            const starter = document.getElementById('select-starter').value;
-            let red = 'human', yellow = 'human';
-            
-            if (mode === 'pvp') { red = 'human'; yellow = 'human'; }
-            else if (mode === 'iavia') { red = 'ia'; yellow = 'ia'; }
-            else {
-                if (starter === 'ia') { red = 'ia'; yellow = 'human'; }
-                else { red = 'human'; yellow = 'ia'; }
-            }
-            document.getElementById('live-red-mode').value = red;
-            document.getElementById('live-yellow-mode').value = yellow;
+        function switchTimer(color) {
+            $("box-red").classList.toggle("active-turn", color === "rouge");
+            $("box-yellow").classList.toggle("active-turn", color === "jaune");
         }
 
-        // Le Cerveau : décide qui doit jouer à l'instant T
-        function checkTurnAndPlay() {
-            if (jeuTermine || iaPaused) return; // Bloqué si fini ou en pause manuelle
-            
-            const currentMode = document.getElementById('live-' + (currentHoverColor === 'rouge' ? 'red' : 'yellow') + '-mode').value;
-            
-            if (currentMode === 'ia') {
-                // Bloque les clics humains et lance l'IA
-                jeuTermine = true; 
-                document.getElementById('status').innerText = "L'IA (" + (currentHoverColor === 'rouge' ? "Rouge" : "Jaune") + ") analyse...";
-                setTimeout(declencherIA, 400); // Petite pause pour la fluidité visuelle
-            } else {
-                // Attend un clic humain
-                document.getElementById('status').innerText = "À vous de jouer (" + (currentHoverColor === 'rouge' ? "Rouges" : "Jaunes") + ") !";
-            }
+        function updateAbandonButton() {
+            $("btn-abandon").innerText = jeuTermine
+                ? "Abandonner"
+                : gameMode === "iavia"
+                    ? `Abandonner ${labelFor(currentColorTurn)}`
+                    : gameMode === "pvp"
+                        ? `Abandonner (${labelFor(currentColorTurn)})`
+                        : controllerFor(currentColorTurn) === "human" ? "Abandonner" : "Faire abandonner l'IA";
         }
 
-        function togglePause() {
-            iaPaused = !iaPaused;
-            const btn = document.getElementById('btn-pause');
-            if (iaPaused) {
-                btn.innerHTML = "▶️ Reprendre";
-                btn.style.backgroundColor = "#4CAF50";
-                btn.style.boxShadow = "0 0 10px #4CAF50";
-                document.getElementById('status').innerText = "Partie en pause.";
-            } else {
-                btn.innerHTML = "⏸️ Pause";
-                btn.style.backgroundColor = "#e94560";
-                btn.style.boxShadow = "0 0 10px #e94560";
-                checkTurnAndPlay(); // Relance si c'était le tour de l'IA
-            }
+        function findLastMove(oldGrid, newGrid) {
+            if (!oldGrid || !newGrid) return null;
+            for (let l = 0; l < lignes; l++) for (let c = 0; c < colonnes; c++) if (oldGrid[l][c] !== newGrid[l][c] && newGrid[l][c] !== 0) return { l, c };
+            return null;
         }
 
-        async function executerAction(action, col) {
-            const response = await fetch('/play', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    action: action, 
-                    colonne: col,
-                    ia_type: document.getElementById('select-ia-type').value,
-                    ia_depth: document.getElementById('live-depth').value
-                })
-            });
-            return await response.json();
+        function isWinningCell(l, c) {
+            return winningCells.some(([wl, wc]) => wl === l && wc === c);
         }
 
-        async function declencherIA() {
-            startProgressBar(); 
-            const data = await executerAction('ia', null);
-            stopProgressBar();
-            handleMoveResult(data);
+        function applyGameState(data) {
+            winningCells = Array.isArray(data.winning_cells) ? data.winning_cells : [];
+            drawBoard(data.grille);
         }
 
-        async function playMove(col) {
-            if (jeuTermine) return;
-            jeuTermine = true; // Empêche le double clic
-            
-            const data = await executerAction('human', col);
-            if (data.error) {
-                alert(data.error);
-                jeuTermine = false;
-                return;
-            }
-            handleMoveResult(data);
-        }
-
-        // Gère la fin de n'importe quel tour (Humain ou IA)
-        function handleMoveResult(data) {
-            drawBoard(data.grille, !!data.vainqueur);
-
-            if (data.vainqueur) {
-                document.getElementById('status').innerText = "👑 Victoire de " + data.vainqueur;
-                document.getElementById('status').style.color = "#00ff88";
-                document.getElementById('board').setAttribute('data-hover', 'none');
-                setBoardNeon('neutre');
-                jeuTermine = true;
-                return;
-            }
-
-            // Passe au joueur suivant
-            currentHoverColor = (currentHoverColor === 'rouge') ? 'jaune' : 'rouge';
-            setBoardNeon(currentHoverColor);
-            document.getElementById('board').setAttribute('data-hover', currentHoverColor);
-            
-            jeuTermine = false; // Réouvre la grille
-            checkTurnAndPlay(); // Vérifie si l'IA doit reprendre le relais
-        }
-
-        // --- FONCTIONS CLASSIQUES (Modifiées pour le nouveau système) ---
-        
-        async function startGame() {
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('game-area').style.display = 'block';
-            
-            iaPaused = false;
-            document.getElementById('btn-pause').innerHTML = "⏸️ Pause";
-            document.getElementById('btn-pause').style.backgroundColor = "#e94560";
-            document.getElementById('btn-pause').style.boxShadow = "0 0 10px #e94560";
-
-            applyMenuToToggles();
-
-            currentHoverColor = 'rouge'; 
-            setBoardNeon('rouge');
-            document.getElementById('board').setAttribute('data-hover', currentHoverColor);
-            document.getElementById('status').style.color = "#f9a826"; // Reset couleur status
-
-            await fetch('/reset', { method: 'POST' });
-            previousGrille = null;
-            drawBoard(null, false);
-
-            jeuTermine = false;
-            checkTurnAndPlay(); // Démarre le moteur !
-        }
-
-        async function importGame() {
-            const fileInput = document.getElementById('import-file');
-            let importStr = document.getElementById('import-string').value.trim();
-
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const text = await file.text();
-                importStr = text.replace(/\s+/g, '');
-            }
-
-            if (importStr === "") { startGame(); return; }
-            if (!/^[1-9]+$/.test(importStr)) {
-                alert("Format invalide ! Uniquement des chiffres de 1 à 9."); return;
-            }
-
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('game-area').style.display = 'block';
-            document.getElementById('status').style.color = "#f9a826";
-            
-            iaPaused = true; // On pause pendant l'import
-            document.getElementById('btn-pause').innerHTML = "▶️ Lancer la suite";
-            document.getElementById('btn-pause').style.backgroundColor = "#4CAF50";
-            document.getElementById('btn-pause').style.boxShadow = "0 0 10px #4CAF50";
-
-            applyMenuToToggles();
-            document.getElementById('status').innerText = "Importation rapide de " + importStr.length + " coup(s)...";
-            document.getElementById('board').classList.remove('neon-rouge', 'neon-jaune', 'neon-neutre'); 
-            startProgressBar();
-
-            await fetch('/reset', { method: 'POST' });
-            
-            let lastData = null;
-            let isWin = false;
-            let validMoves = 0;
-
-            for (let i = 0; i < importStr.length; i++) {
-                let col = parseInt(importStr[i]) - 1; 
-                lastData = await executerAction('human', col); 
-                if (lastData.error) { alert("Erreur d'import : " + lastData.error); break; }
-                validMoves++;
-                if (lastData.vainqueur) { isWin = true; break; }
-            }
-            
-            stopProgressBar();
-            drawBoard(lastData.grille, isWin);
-
-            if (isWin) {
-                document.getElementById('status').innerText = "👑 Victoire de " + lastData.vainqueur + " (Séquence terminée)";
-                document.getElementById('status').style.color = "#00ff88";
-                document.getElementById('board').setAttribute('data-hover', 'none'); 
-                setBoardNeon('neutre');
-                jeuTermine = true;
-                return;
-            }
-
-            const isRedNext = (validMoves % 2 === 0);
-            currentHoverColor = isRedNext ? 'rouge' : 'jaune';
-            setBoardNeon(currentHoverColor);
-            document.getElementById('board').setAttribute('data-hover', currentHoverColor);
-            
-            jeuTermine = false;
-            document.getElementById('status').innerText = "Import terminé. Vérifiez vos modes puis cliquez sur Reprendre.";
-        }
-
-        // --- UTILITAIRES GRILLE ---
-        function findLastMove(oldG, newG) {
-            if (!oldG || !newG) return null;
+        function drawBoard(grille) {
+            const board = $("board"), last = findLastMove(previousGrille, grille);
+            board.innerHTML = "";
             for (let l = 0; l < lignes; l++) {
                 for (let c = 0; c < colonnes; c++) {
-                    if (oldG[l][c] !== newG[l][c] && newG[l][c] !== 0) return {l, c};
-                }
-            } return null;
-        }
-
-        function getWinningCells(grille) {
-            let winCells = [];
-            const dirs = [[0,1], [1,0], [1,1], [1,-1]]; 
-            for (let l = 0; l < lignes; l++) {
-                for (let c = 0; c < colonnes; c++) {
-                    let p = grille[l][c];
-                    if (p === 0) continue;
-                    for (let d of dirs) {
-                        let dl = d[0], dc = d[1], cells = [{l, c}], nl = l + dl, nc = c + dc;
-                        while (nl >= 0 && nl < lignes && nc >= 0 && nc < colonnes && grille[nl][nc] === p) {
-                            cells.push({l: nl, c: nc}); nl += dl; nc += dc;
-                        }
-                        if (cells.length >= 4) cells.forEach(cell => {
-                            if (!winCells.some(w => w.l === cell.l && w.c === cell.c)) winCells.push(cell);
-                        });
-                    }
-                }
-            } return winCells;
-        }
-
-        function drawBoard(grille, isWin = false) {
-            const boardDiv = document.getElementById('board');
-            boardDiv.innerHTML = '';
-            
-            const lastMove = findLastMove(previousGrille, grille);
-            const winningCells = isWin ? getWinningCells(grille) : [];
-
-            for (let l = 0; l < lignes; l++) {
-                for (let c = 0; c < colonnes; c++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell');
-                    if (grille) {
-                        if (grille[l][c] === 1) cell.classList.add('rouge');
-                        if (grille[l][c] === 2) cell.classList.add('jaune');
-                        if (lastMove && lastMove.l === l && lastMove.c === c) cell.classList.add('last-move');
-                        if (winningCells.some(w => w.l === l && w.c === c)) cell.classList.add('winning-cell');
-                    }
-                    // Le clic n'est autorisé que si c'est défini sur Humain
-                    cell.onclick = () => { 
-                        if (!jeuTermine && !iaPaused) {
-                            const currentMode = document.getElementById('live-' + (currentHoverColor==='rouge'?'red':'yellow') + '-mode').value;
-                            if (currentMode === 'human') playMove(c);
-                        }
-                    };
-                    boardDiv.appendChild(cell);
+                    const cell = document.createElement("div");
+                    cell.className = "cell";
+                    if (grille[l][c] === 1) cell.classList.add("rouge");
+                    if (grille[l][c] === 2) cell.classList.add("jaune");
+                    if (isWinningCell(l, c)) cell.classList.add("winning-halo");
+                    if (last && last.l === l && last.c === c && !paintMode) cell.classList.add("last-move");
+                    cell.onclick = () => paintMode ? (!isAiThinking && paintCell(l, c)) : (grille[l][c] === 0 && playMove(c));
+                    board.appendChild(cell);
                 }
             }
             for (let c = 0; c < colonnes; c++) {
-                const num = document.createElement('div');
-                num.classList.add('col-number');
+                const num = document.createElement("div");
+                num.className = "col-number";
                 num.innerText = c + 1;
-                boardDiv.appendChild(num);
+                board.appendChild(num);
             }
-            if (grille) previousGrille = JSON.parse(JSON.stringify(grille));
+            previousGrille = JSON.parse(JSON.stringify(grille));
+        }
+
+        function turnUi(message) {
+            if (jeuTermine) return;
+            $("status").style.color = "#f9a826";
+            switchTimer(currentColorTurn);
+            setBoardNeon(currentColorTurn);
+            $("board").setAttribute("data-hover", controllerFor(currentColorTurn) === "human" && !paintMode ? currentColorTurn : "none");
+            $("status").innerText = message || (controllerFor(currentColorTurn) === "human" ? (gameMode === "pvp" ? `${labelFor(currentColorTurn)} a vous de jouer !` : "A vous de jouer !") : `${labelFor(currentColorTurn)} reflechit...`);
+            updateAbandonButton();
+        }
+
+        function handleWin(data) {
+            jeuTermine = true;
+            isAiThinking = false;
+            clearInterval(timerInterval);
+            clearInterval(aiPollingInterval);
+            const nul = data.winner_type === "draw" || data.vainqueur === "Nul";
+            const humanWin = gameMode === "pvia" && controllerFor(data.winner_color) === "human";
+            const aiWin = gameMode === "pvia" && controllerFor(data.winner_color) === "ia";
+            $("status").innerText = nul ? "Match nul !" : humanWin ? "Victoire de l'humain !" : aiWin ? "Victoire de l'IA !" : `Victoire de ${labelFor(data.winner_color)} !`;
+            $("status").style.color = nul ? "#ffcc00" : "#00ff88";
+            $("board").setAttribute("data-hover", "none");
+            setBoardNeon("neutre");
+            updateAbandonButton();
         }
 
         function startProgressBar() {
-            document.getElementById('progress-container').style.display = 'block';
-            let width = 0;
-            document.getElementById('progress-bar').style.width = '0%';
-            progressInterval = setInterval(() => {
-                if (width < 95) {
-                    width += Math.random() * 10; 
-                    document.getElementById('progress-bar').style.width = width + '%';
-                }
-            }, 100);
+            $("progress-container").style.display = "block";
+            $("progress-bar").style.width = "0%";
+            const start = Date.now();
+            clearInterval(aiPollingInterval);
+            aiPollingInterval = setInterval(async () => {
+                $("progress-bar").style.width = `${Math.min(((Date.now() - start) / 14000) * 100, 100)}%`;
+                try {
+                    const data = await (await fetch("/status_ia")).json();
+                    if (data.profondeur > 0 && $("ia-msg").innerText === "") $("ia-msg").innerText = `Profondeur exploree : ${data.profondeur}...`;
+                } catch (error) {}
+            }, 400);
         }
 
         function stopProgressBar() {
-            clearInterval(progressInterval);
-            document.getElementById('progress-bar').style.width = '100%';
-            setTimeout(() => { document.getElementById('progress-container').style.display = 'none'; }, 400);
+            clearInterval(aiPollingInterval);
+            $("progress-bar").style.width = "100%";
+            setTimeout(() => { $("progress-container").style.display = "none"; }, 350);
         }
+
+        function handleTimeout(expiredColor) {
+            $("ia-msg").innerText = `${labelFor(expiredColor)} perd au temps.`;
+            handleWin({ winner_color: toggleColor(expiredColor), winner_type: controllerFor(toggleColor(expiredColor)) });
+        }
+
+        function startTimers() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (jeuTermine || paintMode) return;
+                currentColorTurn === "rouge" ? timeRed-- : timeYellow--;
+                updateTimersDisplay();
+                if (timeRed <= 0) { clearInterval(timerInterval); handleTimeout("rouge"); }
+                if (timeYellow <= 0) { clearInterval(timerInterval); handleTimeout("jaune"); }
+            }, 1000);
+        }
+
+        async function prepareGameArea() {
+            gameMode = getSelectedMode();
+            paintMode = false;
+            jeuTermine = false;
+            isAiThinking = false;
+            previousGrille = null;
+            winningCells = [];
+            $("menu").style.display = "none";
+            $("paint-controls").style.display = "none";
+            $("game-area").style.display = "block";
+            $("live-controls").style.display = "flex";
+            $("timers").style.display = "flex";
+            $("ia-msg").innerText = "";
+            $("ia-msg").style.color = "#00ff88";
+            $("status").style.color = "#f9a826";
+            timeRed = 600; timeYellow = 600; updateTimersDisplay(); switchTimer("rouge"); updateAbandonButton();
+        }
+
+        function configureParticipants() {
+            gameMode = getSelectedMode();
+            if (gameMode === "pvia") {
+                humanColor = $("select-starter").value === "ia" ? "jaune" : "rouge";
+            } else {
+                humanColor = "rouge";
+            }
+            currentColorTurn = "rouge";
+            updatePlayerLabels();
+        }
+
+        async function enterPaintMode() {
+            updateModeSettings();
+            $("menu").style.display = "none";
+            $("game-area").style.display = "block";
+            $("live-controls").style.display = "none";
+            $("timers").style.display = "none";
+            $("paint-controls").style.display = "flex";
+            $("status").innerText = "Mode peinture";
+            $("status").style.color = "#f9a826";
+            $("ia-msg").innerText = "";
+            $("board").setAttribute("data-hover", "none");
+            setBoardNeon("neutre");
+            paintMode = true;
+            customBoardActive = true;
+            jeuTermine = false;
+            previousGrille = null;
+            winningCells = [];
+            await fetchJson("/reset");
+            drawBoard(emptyGrid());
+        }
+
+        async function paintCell(r, c) {
+            drawBoard((await fetchJson("/paint", { row: r, col: c, color: paintColor })).grille);
+        }
+
+        async function analyzeBoard() {
+            if (isAiThinking) return;
+            isAiThinking = true;
+            $("ia-msg").innerText = "";
+            $("ia-msg").style.color = "#00ff88";
+            startProgressBar();
+            try {
+                const data = await fetchJson("/play", { action: "analyze", color: colorToInt($("paint-next-turn").value) });
+                if (data.message_ia) $("ia-msg").innerText = data.message_ia;
+            } finally {
+                stopProgressBar();
+                isAiThinking = false;
+            }
+        }
+
+        function exitPaintMode() {
+            paintMode = false;
+            $("paint-controls").style.display = "none";
+            $("game-area").style.display = "none";
+            $("menu").style.display = "block";
+            $("btn-start-game").innerText = "JOUER SUR CE PLATEAU";
+            $("btn-start-game").style.backgroundColor = "#27ae60";
+            updateModeSettings();
+        }
+
+        async function runAiTurn(color) {
+            isAiThinking = true;
+            $("ia-msg").innerText = "";
+            $("ia-msg").style.color = "#00ff88";
+            turnUi(`${labelFor(color)} analyse...`);
+            startProgressBar();
+            try {
+                const data = await fetchJson("/play", { action: "ia", color: colorToInt(color) });
+                applyGameState(data);
+                if (data.message_ia) {
+                    $("ia-msg").innerText = data.message_ia;
+                    const lower = data.message_ia.toLowerCase();
+                    $("ia-msg").style.color = lower.includes("defaite") || lower.includes("mat") ? "#e94560" : "#00ff88";
+                }
+                return data;
+            } finally {
+                stopProgressBar();
+                isAiThinking = false;
+            }
+        }
+
+        async function autoLoop() {
+            while (!jeuTermine && controllerFor(currentColorTurn) === "ia") {
+                const data = await runAiTurn(currentColorTurn);
+                if (!data.played) { $("status").innerText = "L'IA n'a pas pu jouer."; return; }
+                if (data.partie_terminee) { handleWin(data); return; }
+                currentColorTurn = data.next_color || toggleColor(currentColorTurn);
+                turnUi();
+                if (gameMode !== "iavia") return;
+                await sleep(250);
+            }
+        }
+
+        async function startGame() {
+            await prepareGameArea();
+            updateModeSettings();
+            if (!customBoardActive) {
+                configureParticipants();
+                await fetchJson("/reset");
+                drawBoard(emptyGrid());
+            } else {
+                gameMode = getSelectedMode();
+                humanColor = gameMode === "pvia" ? $("paint-human-color").value : "rouge";
+                currentColorTurn = $("paint-next-turn").value;
+                updatePlayerLabels();
+                applyGameState(await fetchJson("/play", { action: "get_grid" }));
+                customBoardActive = false;
+                $("btn-start-game").innerText = "NOUVELLE PARTIE";
+                $("btn-start-game").style.backgroundColor = "#e94560";
+            }
+            startTimers();
+            turnUi();
+            if (controllerFor(currentColorTurn) === "ia") await autoLoop();
+        }
+
+        async function importGame() {
+            const file = $("import-file");
+            let sequence = $("import-string").value.trim();
+            if (file.files.length > 0) sequence = (await file.files[0].text()).replace(/\s+/g, "");
+            if (sequence === "") { await startGame(); return; }
+            if (!/^[1-9]+$/.test(sequence)) { alert("Format invalide. Utilisez uniquement des chiffres de 1 a 9."); return; }
+            await prepareGameArea();
+            configureParticipants();
+            await fetchJson("/reset");
+            drawBoard(emptyGrid());
+            let data = null;
+            for (let i = 0; i < sequence.length; i++) {
+                data = await fetchJson("/play", { action: "human", colonne: parseInt(sequence[i], 10) - 1, color: i % 2 === 0 ? 1 : 2 });
+                if (!data.played) { alert("La sequence importee contient au moins un coup impossible."); break; }
+                if (data.partie_terminee) break;
+            }
+            if (!data) return;
+            applyGameState(data);
+            if (!data.played && !data.partie_terminee) return;
+            if (data.partie_terminee) { handleWin(data); return; }
+            currentColorTurn = data.next_color || "rouge";
+            startTimers();
+            turnUi();
+            if (controllerFor(currentColorTurn) === "ia") await autoLoop();
+        }
+
+        async function undoMove() {
+            if (paintMode || isAiThinking) return;
+            const data = await fetchJson("/undo", { steps: gameMode === "pvp" ? 1 : 2 });
+            applyGameState(data);
+            $("ia-msg").innerText = "";
+            jeuTermine = false;
+            currentColorTurn = data.next_color || "rouge";
+            turnUi("Coup annule.");
+            if (controllerFor(currentColorTurn) === "ia") await autoLoop();
+        }
+
+        async function abandonGame() {
+            if (jeuTermine || paintMode || isAiThinking) return;
+            const data = await fetchJson("/abandon", { mode: gameMode, color: colorToInt(currentColorTurn), human_color: humanColor });
+            $("ia-msg").innerText = `${labelFor(currentColorTurn)} abandonne la partie.`;
+            handleWin(data);
+        }
+
+        async function playMove(col) {
+            if (jeuTermine || paintMode || isAiThinking || controllerFor(currentColorTurn) !== "human") return;
+            $("ia-msg").innerText = "";
+            const data = await fetchJson("/play", { action: "human", colonne: col, color: colorToInt(currentColorTurn) });
+            if (!data.played) return;
+            applyGameState(data);
+            if (data.partie_terminee) { handleWin(data); return; }
+            currentColorTurn = data.next_color || toggleColor(currentColorTurn);
+            turnUi();
+            if (controllerFor(currentColorTurn) === "ia") await autoLoop();
+        }
+
+        function onImportFileSelected() {
+            $("file-upload-label").innerText = $("import-file").files.length > 0 ? `Fichier pret : ${$("import-file").files[0].name}` : "Parcourir un fichier...";
+        }
+
+        window.addEventListener("load", () => {
+            updateModeSettings();
+            updatePlayerLabels();
+            updateTimersDisplay();
+            drawBoard(emptyGrid());
+            switchTimer("rouge");
+            updateAbandonButton();
+        });
     </script>
 </body>
 </html>
