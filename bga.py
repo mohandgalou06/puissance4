@@ -48,7 +48,7 @@ class BGAApp:
         tk.Label(player_frame, text="ID Joueur:").pack(side=tk.LEFT)
         self.player_entry = tk.Entry(player_frame, width=20)
         self.player_entry.pack(side=tk.LEFT, padx=10)
-        self.player_entry.insert(0, "97047639")
+        self.player_entry.insert(0, "90577406")
         
         # Bouton Scrutation
         self.scrute_button = tk.Button(root, text="Scruter les Tables", command=self.scrute_tables, state=tk.DISABLED)

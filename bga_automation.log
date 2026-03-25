@@ -491,3 +491,169 @@ dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
 2026-03-10 21:57:40,035 - INFO - Erreur table 610846692 : Message: Tried to run command without establishing a connection; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
 
 2026-03-10 21:57:40,035 - INFO - === FIN DU SCRAPING : 0 PARTIES EN BDD ===
+2026-03-23 19:40:29,908 - INFO - package: mysql.connector.plugins
+2026-03-23 19:40:29,909 - INFO - plugin_name: mysql_native_password
+2026-03-23 19:40:29,910 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-23 19:40:32,979 - INFO - ====== WebDriver manager ======
+2026-03-23 19:40:36,235 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-23 19:40:36,723 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-23 19:40:36,992 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-23 19:40:37,243 - INFO - Getting latest mozilla release info for v0.36.0
+2026-03-23 19:40:37,647 - INFO - About to download new driver from https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-win64.zip
+2026-03-23 19:40:38,321 - INFO - Driver downloading response is 200
+2026-03-23 19:40:38,929 - INFO - Get LATEST geckodriver version for 147.0 firefox
+2026-03-23 19:40:39,205 - INFO - Driver has been saved in cache [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0]
+2026-03-23 19:40:39,207 - INFO - Lancement de Firefox...
+2026-03-23 19:40:44,494 - INFO - ERREUR: Message: Process unexpectedly closed with status 0
+
+2026-03-23 19:40:56,379 - INFO - ====== WebDriver manager ======
+2026-03-23 19:40:58,411 - INFO - Get LATEST geckodriver version for 148.0 firefox
+2026-03-23 19:40:58,704 - INFO - Get LATEST geckodriver version for 148.0 firefox
+2026-03-23 19:40:58,959 - INFO - There is no [win64] geckodriver "v0.36.0" for browser firefox "148.0" in cache
+2026-03-23 19:40:58,959 - INFO - Get LATEST geckodriver version for 148.0 firefox
+2026-03-23 19:40:59,225 - INFO - Getting latest mozilla release info for v0.36.0
+2026-03-23 19:40:59,494 - INFO - About to download new driver from https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-win64.zip
+2026-03-23 19:41:00,025 - INFO - Driver downloading response is 200
+2026-03-23 19:41:00,640 - INFO - Get LATEST geckodriver version for 148.0 firefox
+2026-03-23 19:41:00,924 - INFO - Driver has been saved in cache [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0]
+2026-03-23 19:41:00,926 - INFO - Lancement de Firefox...
+2026-03-23 19:41:09,004 - INFO - Recherche du bandeau de cookies...
+2026-03-23 19:41:09,142 - INFO - Cookies refusés.
+2026-03-23 19:41:11,142 - INFO - Remplissage de l'email...
+2026-03-23 19:41:11,718 - INFO - Clic sur Suivant...
+2026-03-23 19:41:14,778 - INFO - Remplissage du mot de passe...
+2026-03-23 19:41:15,346 - INFO - Clic sur le bouton de connexion...
+2026-03-23 19:41:23,961 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=90577406
+2026-03-23 19:41:24,997 - INFO - Attente du chargement de l'historique...
+2026-03-23 19:41:27,008 - INFO - Analyse de 10 lignes trouvées...
+2026-03-23 19:41:27,253 - INFO - Succès : 10 tables extraites.
+2026-03-23 19:41:36,999 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=90577406
+2026-03-23 19:41:37,984 - INFO - Attente du chargement de l'historique...
+2026-03-23 19:41:40,111 - INFO - Analyse de 10 lignes trouvées...
+2026-03-23 19:41:40,385 - INFO - Succès : 10 tables extraites.
+2026-03-23 19:42:01,509 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=94154229
+2026-03-23 19:42:03,544 - INFO - Attente du chargement de l'historique...
+2026-03-23 19:42:05,554 - INFO - Analyse de 10 lignes trouvées...
+2026-03-23 19:42:05,656 - INFO - Succès : 2 tables extraites.
+2026-03-23 19:42:10,697 - INFO - Début du scrap sur 2 tables...
+2026-03-23 19:42:10,697 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=816518007
+2026-03-23 19:42:18,496 - INFO - Logs trouvés : 22
+2026-03-23 19:42:18,571 - INFO - SUCCÈS : Table 816518007 enregistrée (20 coups)
+2026-03-23 19:42:18,572 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=815496006
+2026-03-23 19:42:26,306 - INFO - Logs trouvés : 15
+2026-03-23 19:42:26,355 - INFO - SUCCÈS : Table 815496006 enregistrée (13 coups)
+2026-03-23 19:42:26,355 - INFO - === FIN DU SCRAPING : 2 PARTIES EN BDD ===
+2026-03-23 19:42:48,617 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=98089779
+2026-03-23 19:42:49,247 - INFO - Attente du chargement de l'historique...
+2026-03-23 19:42:51,258 - INFO - Analyse de 10 lignes trouvées...
+2026-03-23 19:42:51,513 - INFO - Succès : 10 tables extraites.
+2026-03-23 19:42:55,956 - INFO - ====== WebDriver manager ======
+2026-03-23 19:42:58,043 - INFO - Get LATEST geckodriver version for 148.0 firefox
+2026-03-23 19:42:58,467 - INFO - Get LATEST geckodriver version for 148.0 firefox
+2026-03-23 19:42:58,739 - INFO - Driver [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0\geckodriver.exe] found in cache
+2026-03-23 19:42:58,739 - INFO - Lancement de Firefox...
+2026-03-23 19:43:06,798 - INFO - Recherche du bandeau de cookies...
+2026-03-23 19:43:06,892 - INFO - Cookies refusés.
+2026-03-23 19:43:08,893 - INFO - Remplissage de l'email...
+2026-03-23 19:43:09,467 - INFO - Clic sur Suivant...
+2026-03-23 19:43:12,525 - INFO - Remplissage du mot de passe...
+2026-03-23 19:43:13,094 - INFO - Clic sur le bouton de connexion...
+2026-03-23 19:43:22,759 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=98089779
+2026-03-23 19:43:23,712 - INFO - Attente du chargement de l'historique...
+2026-03-23 19:43:25,721 - INFO - Analyse de 10 lignes trouvées...
+2026-03-23 19:43:25,956 - INFO - Succès : 10 tables extraites.
+2026-03-23 19:43:28,538 - INFO - Début du scrap sur 10 tables...
+2026-03-23 19:43:28,538 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=782721096
+2026-03-23 19:43:36,807 - INFO - Logs trouvés : 27
+2026-03-23 19:43:36,890 - INFO - SUCCÈS : Table 782721096 enregistrée (22 coups)
+2026-03-23 19:43:36,891 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=782724203
+2026-03-23 19:43:44,818 - INFO - Logs trouvés : 44
+2026-03-23 19:43:44,953 - INFO - SUCCÈS : Table 782724203 enregistrée (35 coups)
+2026-03-23 19:43:44,953 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=782713593
+2026-03-23 19:43:52,716 - INFO - Logs trouvés : 61
+2026-03-23 19:43:52,890 - INFO - SUCCÈS : Table 782713593 enregistrée (51 coups)
+2026-03-23 19:43:52,890 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=782712642
+2026-03-23 19:44:00,712 - INFO - Logs trouvés : 24
+2026-03-23 19:44:00,793 - INFO - SUCCÈS : Table 782712642 enregistrée (19 coups)
+2026-03-23 19:44:00,793 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=782702295
+2026-03-23 19:44:08,718 - INFO - Logs trouvés : 11
+2026-03-23 19:44:08,755 - INFO - SUCCÈS : Table 782702295 enregistrée (9 coups)
+2026-03-23 19:44:08,756 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=753977890
+2026-03-23 19:44:16,488 - INFO - Logs trouvés : 24
+2026-03-23 19:44:16,563 - INFO - SUCCÈS : Table 753977890 enregistrée (22 coups)
+2026-03-23 19:44:16,564 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=753964185
+2026-03-23 19:44:24,326 - INFO - Logs trouvés : 19
+2026-03-23 19:44:24,380 - INFO - SUCCÈS : Table 753964185 enregistrée (16 coups)
+2026-03-23 19:44:24,380 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=753940788
+2026-03-23 19:44:32,472 - INFO - Logs trouvés : 35
+2026-03-23 19:44:32,572 - INFO - SUCCÈS : Table 753940788 enregistrée (28 coups)
+2026-03-23 19:44:32,572 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=753885286
+2026-03-23 19:44:40,545 - INFO - Logs trouvés : 18
+2026-03-23 19:44:40,607 - INFO - SUCCÈS : Table 753885286 enregistrée (16 coups)
+2026-03-23 19:44:40,607 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=753878309
+2026-03-23 19:44:48,317 - INFO - Logs trouvés : 25
+2026-03-23 19:44:48,390 - INFO - SUCCÈS : Table 753878309 enregistrée (20 coups)
+2026-03-23 19:44:48,390 - INFO - === FIN DU SCRAPING : 10 PARTIES EN BDD ===
+2026-03-24 18:10:08,039 - INFO - package: mysql.connector.plugins
+2026-03-24 18:10:08,039 - INFO - plugin_name: mysql_native_password
+2026-03-24 18:10:08,040 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-03-24 18:10:09,879 - INFO - ====== WebDriver manager ======
+2026-03-24 18:10:13,080 - INFO - Get LATEST geckodriver version for 148.0 firefox
+2026-03-24 18:10:13,599 - INFO - Get LATEST geckodriver version for 148.0 firefox
+2026-03-24 18:10:13,860 - INFO - Get LATEST geckodriver version for 148.0 firefox
+2026-03-24 18:10:14,134 - INFO - Getting latest mozilla release info for v0.36.0
+2026-03-24 18:10:14,567 - INFO - About to download new driver from https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-win64.zip
+2026-03-24 18:10:15,326 - INFO - Driver downloading response is 200
+2026-03-24 18:10:15,957 - INFO - Get LATEST geckodriver version for 148.0 firefox
+2026-03-24 18:10:16,269 - INFO - Driver has been saved in cache [C:\Users\Benoi\.wdm\drivers\geckodriver\win64\v0.36.0]
+2026-03-24 18:10:16,270 - INFO - Lancement de Firefox...
+2026-03-24 18:10:24,499 - INFO - Recherche du bandeau de cookies...
+2026-03-24 18:10:24,639 - INFO - Cookies refusés.
+2026-03-24 18:10:26,640 - INFO - Remplissage de l'email...
+2026-03-24 18:10:27,216 - INFO - Clic sur Suivant...
+2026-03-24 18:10:30,276 - INFO - Remplissage du mot de passe...
+2026-03-24 18:10:30,843 - INFO - Clic sur le bouton de connexion...
+2026-03-24 18:10:48,763 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=98168368
+2026-03-24 18:10:51,547 - INFO - Attente du chargement de l'historique...
+2026-03-24 18:10:53,559 - INFO - Analyse de 10 lignes trouvées...
+2026-03-24 18:10:53,815 - INFO - Succès : 10 tables extraites.
+2026-03-24 18:11:02,166 - INFO - Début du scrap sur 10 tables...
+2026-03-24 18:11:02,166 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=826109627
+2026-03-24 18:11:11,882 - INFO - Logs trouvés : 42
+2026-03-24 18:11:12,005 - INFO - SUCCÈS : Table 826109627 enregistrée (39 coups)
+2026-03-24 18:11:12,006 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=826100922
+2026-03-24 18:11:21,081 - INFO - Logs trouvés : 36
+2026-03-24 18:11:21,185 - INFO - SUCCÈS : Table 826100922 enregistrée (34 coups)
+2026-03-24 18:11:21,185 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=826102761
+2026-03-24 18:11:30,778 - INFO - Logs trouvés : 69
+2026-03-24 18:11:30,971 - INFO - SUCCÈS : Table 826102761 enregistrée (58 coups)
+2026-03-24 18:11:30,971 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=826102350
+2026-03-24 18:11:38,737 - INFO - Logs trouvés : 28
+2026-03-24 18:11:38,822 - INFO - SUCCÈS : Table 826102350 enregistrée (26 coups)
+2026-03-24 18:11:38,822 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=826096171
+2026-03-24 18:11:46,646 - INFO - Logs trouvés : 20
+2026-03-24 18:11:46,712 - INFO - SUCCÈS : Table 826096171 enregistrée (18 coups)
+2026-03-24 18:11:46,712 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=826094450
+2026-03-24 18:11:54,497 - INFO - Logs trouvés : 21
+2026-03-24 18:11:54,564 - INFO - SUCCÈS : Table 826094450 enregistrée (19 coups)
+2026-03-24 18:11:54,565 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=826084989
+2026-03-24 18:12:02,343 - INFO - Logs trouvés : 18
+2026-03-24 18:12:02,395 - INFO - SUCCÈS : Table 826084989 enregistrée (16 coups)
+2026-03-24 18:12:02,395 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=826080719
+2026-03-24 18:12:10,129 - INFO - Logs trouvés : 9
+2026-03-24 18:12:10,160 - INFO - SUCCÈS : Table 826080719 enregistrée (6 coups)
+2026-03-24 18:12:10,161 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=826088978
+2026-03-24 18:12:17,975 - INFO - Logs trouvés : 18
+2026-03-24 18:12:18,029 - INFO - SUCCÈS : Table 826088978 enregistrée (16 coups)
+2026-03-24 18:12:18,029 - INFO - Ouverture du Replay : https://boardgamearena.com/gamereview?table=826086428
+2026-03-24 18:12:26,151 - INFO - Logs trouvés : 15
+2026-03-24 18:12:26,199 - INFO - SUCCÈS : Table 826086428 enregistrée (13 coups)
+2026-03-24 18:12:26,200 - INFO - === FIN DU SCRAPING : 10 PARTIES EN BDD ===
+2026-03-24 18:12:41,126 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=98168368
+2026-03-24 18:12:42,257 - INFO - Attente du chargement de l'historique...
+2026-03-24 18:12:44,268 - INFO - Analyse de 10 lignes trouvées...
+2026-03-24 18:12:44,518 - INFO - Succès : 10 tables extraites.
+2026-03-24 18:12:49,900 - INFO - Navigation vers : https://boardgamearena.com/gamestats?player=98168368
+2026-03-24 18:12:51,169 - INFO - Attente du chargement de l'historique...
+2026-03-24 18:12:53,179 - INFO - Analyse de 10 lignes trouvées...
+2026-03-24 18:12:53,427 - INFO - Succès : 10 tables extraites.

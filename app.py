@@ -1,77 +1,264 @@
-from flask import Flask, render_template, request, jsonify, session
-from game_logic import GameLogic
+from flask import Flask, jsonify, render_template, request, session
+
 from ai import IA_Tournoi
-from constants import ROUGE, JAUNE
-import random
+from constants import JAUNE, ROUGE
+from game_logic import GameLogic
+
+BOARD_SIZE = 9
 
 app = Flask(__name__)
-app.secret_key = "clef_secrete_super_puissance4_bga" 
+app.secret_key = "clef_secrete_super_puissance4_bga"
 
 ia_terminator = IA_Tournoi()
 
-@app.route('/')
+
+def grille_vide():
+    return [[0 for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
+
+
+def copier_grille(grille):
+    return [ligne[:] for ligne in grille]
+
+
+def initialiser_session():
+    if "grille" not in session:
+        session["grille"] = grille_vide()
+    if "historique" not in session:
+        session["historique"] = []
+
+
+def charger_partie():
+    initialiser_session()
+    logic = GameLogic()
+    logic.grille = copier_grille(session["grille"])
+    historique = [list(coup) for coup in session.get("historique", [])]
+    return logic, historique
+
+
+def sauvegarder_partie(logic, historique):
+    session["grille"] = copier_grille(logic.grille)
+    session["historique"] = [list(coup) for coup in historique]
+    session.modified = True
+
+
+def prochain_joueur(historique):
+    return ROUGE if len(historique) % 2 == 0 else JAUNE
+
+
+def normaliser_couleur(couleur, historique):
+    if couleur in (ROUGE, "rouge", "1", 1):
+        return ROUGE
+    if couleur in (JAUNE, "jaune", "2", 2):
+        return JAUNE
+    return prochain_joueur(historique)
+
+
+def couleur_label(couleur):
+    if couleur == ROUGE:
+        return "rouge"
+    if couleur == JAUNE:
+        return "jaune"
+    return None
+
+
+def nom_couleur(couleur):
+    return "Rouge" if couleur == ROUGE else "Jaune"
+
+
+def construire_reponse(
+    logic,
+    historique,
+    vainqueur=None,
+    winner_color=None,
+    winner_type=None,
+    winning_cells=None,
+    message_ia="",
+    played=False,
+    status="ok",
+):
+    if winning_cells is None:
+        winning_cells = []
+
+    return jsonify(
+        {
+            "status": status,
+            "grille": logic.grille,
+            "historique_len": len(historique),
+            "played": played,
+            "partie_terminee": winner_type is not None,
+            "next_color": None if winner_type is not None else couleur_label(prochain_joueur(historique)),
+            "vainqueur": vainqueur,
+            "winner_color": couleur_label(winner_color),
+            "winner_type": winner_type,
+            "winning_cells": winning_cells,
+            "message_ia": message_ia,
+        }
+    )
+
+
+@app.route("/")
 def index():
-    return render_template('index.html')
+    session["grille"] = grille_vide()
+    session["historique"] = []
+    return render_template("index.html")
 
-@app.route('/reset', methods=['POST'])
+
+@app.route("/status_ia", methods=["GET"])
+def status_ia():
+    import generateur_tournoi
+
+    return jsonify({"profondeur": generateur_tournoi.CURRENT_DEPTH})
+
+
+@app.route("/reset", methods=["POST"])
 def reset():
-    session['grille'] = [[0 for _ in range(9)] for _ in range(9)]
-    session['historique'] = []
-    return jsonify({"status": "ok"})
+    session["grille"] = grille_vide()
+    session["historique"] = []
+    session.modified = True
+    return jsonify({"status": "ok", "grille": session["grille"], "next_color": "rouge"})
 
-@app.route('/play', methods=['POST'])
-def play():
-    data = request.json
-    colonne = data.get('colonne')
-    ia_type = data.get('ia_type', 'minimax')
-    ia_depth = int(data.get('ia_depth', 6))
-    action = data.get('action') # 'human' ou 'ia'
+
+@app.route("/paint", methods=["POST"])
+def paint():
+    data = request.get_json(silent=True) or {}
+    r, c, couleur = data.get("row"), data.get("col"), data.get("color")
+
+    logic, _ = charger_partie()
+
+    if r is not None and c is not None and 0 <= r < BOARD_SIZE and 0 <= c < BOARD_SIZE:
+        logic.grille[r][c] = couleur
+
+    session["grille"] = copier_grille(logic.grille)
+    session["historique"] = []
+    session.modified = True
+    return jsonify({"status": "ok", "grille": logic.grille})
+
+
+@app.route("/undo", methods=["POST"])
+def undo():
+    data = request.get_json(silent=True) or {}
+    steps = int(data.get("steps", 2))
+    steps = max(1, steps)
+
+    _, historique = charger_partie()
+    historique = historique[: max(0, len(historique) - steps)]
 
     logic = GameLogic()
-    logic.nb_lignes = 9
-    logic.nb_colonnes = 9
-    
-    logic.grille = session.get('grille')
-    if logic.grille is None:
-        logic.grille = [[0 for _ in range(9)] for _ in range(9)]
-    historique = session.get('historique', [])
+    logic.grille = grille_vide()
+    for l, c, j in historique:
+        logic.grille[l][c] = j
 
+    sauvegarder_partie(logic, historique)
+    return construire_reponse(logic, historique)
+
+
+@app.route("/abandon", methods=["POST"])
+def abandon():
+    data = request.get_json(silent=True) or {}
+    mode = data.get("mode", "pvia")
+    logic, historique = charger_partie()
+
+    joueur_abandon = normaliser_couleur(data.get("color"), historique)
+    human_color = normaliser_couleur(data.get("human_color"), historique)
+    winner_color = JAUNE if joueur_abandon == ROUGE else ROUGE
+
+    if mode == "pvp":
+        winner_type = "human"
+    elif mode == "iavia":
+        winner_type = "ia"
+    else:
+        winner_type = "human" if winner_color == human_color else "ia"
+
+    return construire_reponse(
+        logic,
+        historique,
+        vainqueur=nom_couleur(winner_color),
+        winner_color=winner_color,
+        winner_type=winner_type,
+        message_ia="Abandon enregistre.",
+    )
+
+
+@app.route("/play", methods=["POST"])
+def play():
+    data = request.get_json(silent=True) or {}
+    colonne = data.get("colonne")
+    action = data.get("action")
+
+    logic, historique = charger_partie()
+
+    message_ia = ""
     vainqueur = None
-    # Déduire à qui c'est le tour
-    joueur_actuel = ROUGE if len(historique) % 2 == 0 else JAUNE
-    nom_joueur = "Rouge" if joueur_actuel == ROUGE else "Jaune"
+    winner_color = None
+    winner_type = None
+    winning_cells = []
+    played = False
 
-    def executer_ia(joueur_ia):
-        if ia_type == 'random':
-            valides = [c for c in range(9) if logic.colonne_valide(c)]
-            return random.choice(valides) if valides else None
-        else:
-            ia_terminator.profondeur_secours = ia_depth
-            return ia_terminator.jouer_coup(logic, historique, joueur_ia)
+    joueur_actuel = normaliser_couleur(data.get("color"), historique)
+    nom_joueur = nom_couleur(joueur_actuel)
 
-    # ACTION 1 : C'est un humain qui joue
-    if action == 'human':
-        if colonne is not None and logic.colonne_valide(colonne):
-            logic.placer_pion(colonne, joueur_actuel)
-            historique.append([0, colonne, joueur_actuel])
-            if logic.victoire(joueur_actuel):
-                vainqueur = nom_joueur
+    if action == "get_grid":
+        return construire_reponse(logic, historique)
 
-    # ACTION 2 : C'est l'IA qui joue
-    elif action == 'ia':
-        col_ia = executer_ia(joueur_actuel)
-        if col_ia is not None:
-            logic.placer_pion(col_ia, joueur_actuel)
-            historique.append([0, col_ia, joueur_actuel])
-            if logic.victoire(joueur_actuel):
-                vainqueur = f"IA {nom_joueur}"
+    if action == "analyze":
+        ia_terminator.budget_secondes = 14.0
+        ia_terminator.max_profondeur = 20
+        ia_terminator.jouer_coup(logic, historique, joueur_actuel)
+        message_ia = getattr(ia_terminator, "dernier_message", "Analyse terminee.")
+        return construire_reponse(logic, historique, message_ia=message_ia)
 
-    session['grille'] = logic.grille
-    session['historique'] = historique
+    if action == "human":
+        if colonne is None or not logic.colonne_valide(colonne):
+            return construire_reponse(logic, historique, message_ia="Colonne invalide.", status="invalid")
 
-    return jsonify({"grille": logic.grille, "vainqueur": vainqueur})
+        l = logic.placer_pion(colonne, joueur_actuel)
+        historique.append([l, colonne, joueur_actuel])
+        played = True
+
+        if logic.victoire(joueur_actuel):
+            vainqueur = nom_joueur
+            winner_color = joueur_actuel
+            winner_type = "human"
+            winning_cells = [list(position) for position in logic.aligne]
+        elif logic.grille_pleine():
+            vainqueur = "Nul"
+            winner_type = "draw"
+
+    elif action == "ia":
+        ia_terminator.budget_secondes = 14.0
+        ia_terminator.max_profondeur = 17
+
+        col_ia = ia_terminator.jouer_coup(logic, historique, joueur_actuel)
+        message_ia = getattr(ia_terminator, "dernier_message", "")
+
+        if col_ia is None or not logic.colonne_valide(col_ia):
+            return construire_reponse(logic, historique, message_ia=message_ia, status="invalid")
+
+        l = logic.placer_pion(col_ia, joueur_actuel)
+        historique.append([l, col_ia, joueur_actuel])
+        played = True
+
+        if logic.victoire(joueur_actuel):
+            vainqueur = nom_joueur
+            winner_color = joueur_actuel
+            winner_type = "ia"
+            winning_cells = [list(position) for position in logic.aligne]
+        elif logic.grille_pleine():
+            vainqueur = "Nul"
+            winner_type = "draw"
+
+    sauvegarder_partie(logic, historique)
+    return construire_reponse(
+        logic,
+        historique,
+        vainqueur=vainqueur,
+        winner_color=winner_color,
+        winner_type=winner_type,
+        winning_cells=winning_cells,
+        message_ia=message_ia,
+        played=played,
+    )
+
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host="0.0.0.0", port=5000, debug=True)

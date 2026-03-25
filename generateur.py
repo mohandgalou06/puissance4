@@ -42,4 +42,4 @@ def generer_parties(nombre_parties):
     print(f"Terminé ! {parties_sauvees}/{nombre_parties} parties uniques sauvegardées en base.")
 
 if __name__ == "__main__":
-    generer_parties(50) 
+    generer_parties(1000) 
