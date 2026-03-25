@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, session
+from flask import Flask, jsonify, render_template, request
 
 from ai import IA_Tournoi
 from constants import JAUNE, ROUGE
@@ -11,39 +11,35 @@ app.secret_key = "clef_secrete_super_puissance4_bga"
 
 ia_terminator = IA_Tournoi()
 
+# 🔥 LE SECRET : Un dictionnaire qui stocke les parties par onglet
+TAB_SESSIONS = {}
 
 def grille_vide():
     return [[0 for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
 
-
 def copier_grille(grille):
     return [ligne[:] for ligne in grille]
 
+def initialiser_session(tab_id):
+    if tab_id not in TAB_SESSIONS:
+        TAB_SESSIONS[tab_id] = {
+            "grille": grille_vide(),
+            "historique": []
+        }
 
-def initialiser_session():
-    if "grille" not in session:
-        session["grille"] = grille_vide()
-    if "historique" not in session:
-        session["historique"] = []
-
-
-def charger_partie():
-    initialiser_session()
+def charger_partie(tab_id):
+    initialiser_session(tab_id)
     logic = GameLogic()
-    logic.grille = copier_grille(session["grille"])
-    historique = [list(coup) for coup in session.get("historique", [])]
+    logic.grille = copier_grille(TAB_SESSIONS[tab_id]["grille"])
+    historique = [list(coup) for coup in TAB_SESSIONS[tab_id].get("historique", [])]
     return logic, historique
 
-
-def sauvegarder_partie(logic, historique):
-    session["grille"] = copier_grille(logic.grille)
-    session["historique"] = [list(coup) for coup in historique]
-    session.modified = True
-
+def sauvegarder_partie(tab_id, logic, historique):
+    TAB_SESSIONS[tab_id]["grille"] = copier_grille(logic.grille)
+    TAB_SESSIONS[tab_id]["historique"] = [list(coup) for coup in historique]
 
 def prochain_joueur(historique):
     return ROUGE if len(historique) % 2 == 0 else JAUNE
-
 
 def normaliser_couleur(couleur, historique):
     if couleur in (ROUGE, "rouge", "1", 1):
@@ -52,7 +48,6 @@ def normaliser_couleur(couleur, historique):
         return JAUNE
     return prochain_joueur(historique)
 
-
 def couleur_label(couleur):
     if couleur == ROUGE:
         return "rouge"
@@ -60,10 +55,8 @@ def couleur_label(couleur):
         return "jaune"
     return None
 
-
 def nom_couleur(couleur):
     return "Rouge" if couleur == ROUGE else "Jaune"
-
 
 def construire_reponse(
     logic,
@@ -95,52 +88,48 @@ def construire_reponse(
         }
     )
 
-
 @app.route("/")
 def index():
-    session["grille"] = grille_vide()
-    session["historique"] = []
     return render_template("index.html")
-
 
 @app.route("/status_ia", methods=["GET"])
 def status_ia():
     import generateur_tournoi
-
     return jsonify({"profondeur": generateur_tournoi.CURRENT_DEPTH})
-
 
 @app.route("/reset", methods=["POST"])
 def reset():
-    session["grille"] = grille_vide()
-    session["historique"] = []
-    session.modified = True
-    return jsonify({"status": "ok", "grille": session["grille"], "next_color": "rouge"})
-
+    data = request.get_json(silent=True) or {}
+    tab_id = data.get("tab_id", "default")
+    
+    TAB_SESSIONS[tab_id] = {
+        "grille": grille_vide(),
+        "historique": []
+    }
+    return jsonify({"status": "ok", "grille": grille_vide(), "next_color": "rouge"})
 
 @app.route("/paint", methods=["POST"])
 def paint():
     data = request.get_json(silent=True) or {}
+    tab_id = data.get("tab_id", "default")
     r, c, couleur = data.get("row"), data.get("col"), data.get("color")
 
-    logic, _ = charger_partie()
+    logic, _ = charger_partie(tab_id)
 
     if r is not None and c is not None and 0 <= r < BOARD_SIZE and 0 <= c < BOARD_SIZE:
         logic.grille[r][c] = couleur
 
-    session["grille"] = copier_grille(logic.grille)
-    session["historique"] = []
-    session.modified = True
+    sauvegarder_partie(tab_id, logic, [])
     return jsonify({"status": "ok", "grille": logic.grille})
-
 
 @app.route("/undo", methods=["POST"])
 def undo():
     data = request.get_json(silent=True) or {}
+    tab_id = data.get("tab_id", "default")
     steps = int(data.get("steps", 2))
     steps = max(1, steps)
 
-    _, historique = charger_partie()
+    _, historique = charger_partie(tab_id)
     historique = historique[: max(0, len(historique) - steps)]
 
     logic = GameLogic()
@@ -148,15 +137,15 @@ def undo():
     for l, c, j in historique:
         logic.grille[l][c] = j
 
-    sauvegarder_partie(logic, historique)
+    sauvegarder_partie(tab_id, logic, historique)
     return construire_reponse(logic, historique)
-
 
 @app.route("/abandon", methods=["POST"])
 def abandon():
     data = request.get_json(silent=True) or {}
+    tab_id = data.get("tab_id", "default")
     mode = data.get("mode", "pvia")
-    logic, historique = charger_partie()
+    logic, historique = charger_partie(tab_id)
 
     joueur_abandon = normaliser_couleur(data.get("color"), historique)
     human_color = normaliser_couleur(data.get("human_color"), historique)
@@ -175,17 +164,17 @@ def abandon():
         vainqueur=nom_couleur(winner_color),
         winner_color=winner_color,
         winner_type=winner_type,
-        message_ia="Abandon enregistre.",
+        message_ia="Abandon enregistré.",
     )
-
 
 @app.route("/play", methods=["POST"])
 def play():
     data = request.get_json(silent=True) or {}
+    tab_id = data.get("tab_id", "default")
     colonne = data.get("colonne")
     action = data.get("action")
 
-    logic, historique = charger_partie()
+    logic, historique = charger_partie(tab_id)
 
     message_ia = ""
     vainqueur = None
@@ -247,7 +236,7 @@ def play():
             vainqueur = "Nul"
             winner_type = "draw"
 
-    sauvegarder_partie(logic, historique)
+    sauvegarder_partie(tab_id, logic, historique)
     return construire_reponse(
         logic,
         historique,
@@ -258,7 +247,6 @@ def play():
         message_ia=message_ia,
         played=played,
     )
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
