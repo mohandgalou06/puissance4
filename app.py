@@ -28,12 +28,11 @@ app  = Flask(__name__, static_folder='static')
 CORS(app)
 
 import os
-db = DatabaseManager(
-    os.environ.get("MYSQLHOST", "localhost"),
-    os.environ.get("MYSQLUSER", "root"),
-    os.environ.get("MYSQLPASSWORD", ""),
-    os.environ.get("MYSQLDATABASE", "railway")
-)
+db = DatabaseManager()
+db.host     = os.environ.get("MYSQLHOST", "localhost")
+db.user     = os.environ.get("MYSQLUSER", "root")
+db.password = os.environ.get("MYSQLPASSWORD", "")
+db.database = os.environ.get("MYSQLDATABASE", "railway")
 DB_OK = db.connect()
 
 # ──────────────────────────────────────────────
