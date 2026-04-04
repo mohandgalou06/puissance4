@@ -18,7 +18,7 @@ from minimax_engine import (
     get_best_move, find_winning_path, evaluate_position,
     check_win_any, EMPTY, P1, P2, ROWS, COLS
 )
-from db_manager import DatabaseManager
+from database import DatabaseManager 
 
 # ──────────────────────────────────────────────
 #  INIT
@@ -27,7 +27,14 @@ from db_manager import DatabaseManager
 app  = Flask(__name__, static_folder='static')
 CORS(app)
 
-db = DatabaseManager()
+import os
+db = DatabaseManager(
+    host=os.environ.get("MYSQLHOST", "localhost"),
+    port=int(os.environ.get("MYSQLPORT", 3306)),
+    user=os.environ.get("MYSQLUSER", "root"),
+    password=os.environ.get("MYSQLPASSWORD", ""),
+    database=os.environ.get("MYSQLDATABASE", "puissance4")
+)
 DB_OK = db.connect()
 
 # ──────────────────────────────────────────────
