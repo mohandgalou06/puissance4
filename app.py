@@ -29,10 +29,6 @@ CORS(app)
 
 import os
 db = DatabaseManager()
-db.host     = os.environ.get("MYSQLHOST", "localhost")
-db.user     = os.environ.get("MYSQLUSER", "root")
-db.password = os.environ.get("MYSQLPASSWORD", "")
-db.database = os.environ.get("MYSQLDATABASE", "railway")
 DB_OK = db.connect()
 
 # ──────────────────────────────────────────────
