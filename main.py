@@ -14,7 +14,7 @@ import sys
 # ⚠️ MODIFIEZ CES VALEURS SELON VOTRE CONFIGURATION
 DB_HOST = "localhost"
 DB_USER = "root"            # ou "pythonuser"
-DB_PASSWORD = "Admin@123456"            # Votre mot de passe MySQL
+DB_PASSWORD = "Galou1646!"  # Votre mot de passe MySQL
 DB_NAME = "puissance4"
 
 def launch_game():

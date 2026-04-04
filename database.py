@@ -1,393 +1,315 @@
 
 
+
+"""
+DB MANAGER — Puissance 4
+Compatible MySQL (Clever Cloud) via mysql-connector-python.
+Utilise les variables d'environnement pour la connexion.
+"""
+
+import os
+import hashlib
+import json
 import mysql.connector
 from mysql.connector import Error
-import hashlib
-import random
-import json
 
 
 class DatabaseManager:
-    def __init__(self, host="localhost", user="root", password="", database="puissance4"):
-        self.host = host
-        self.user = user
-        self.password = password
-        self.database = database
-        self.connection = None
+    def __init__(self):
+        self.host     = os.environ.get("MYSQL_HOST",     "localhost")
+        self.port     = int(os.environ.get("MYSQL_PORT", 3306))
+        self.user     = os.environ.get("MYSQL_USER",     "root")
+        self.password = os.environ.get("MYSQL_PASSWORD", "")
+        self.database = os.environ.get("MYSQL_DATABASE", "puissance4")
+        self.conn     = None
+
+    # ──────────────────────────────────────────
+    #  CONNEXION
+    # ──────────────────────────────────────────
 
     def connect(self):
         try:
-            self.connection = mysql.connector.connect(
+            self.conn = mysql.connector.connect(
                 host=self.host,
+                port=self.port,
                 user=self.user,
                 password=self.password,
-                database=self.database
+                database=self.database,
+                connection_timeout=10,
+                autocommit=False,
             )
-            if self.connection.is_connected():
-                print(f"✅ Connecté à MySQL (base: {self.database})")
+            if self.conn.is_connected():
+                print(f"✅ MySQL connecté ({self.host}:{self.port}/{self.database})")
+                self._init_schema()
                 return True
-        except Exception as e:
-            print(f"❌ Erreur connexion BDD : {e}")
+        except Error as e:
+            print(f"❌ MySQL erreur: {e}")
+            self.conn = None
             return False
 
     def disconnect(self):
-        if self.connection and self.connection.is_connected():
-            self.connection.close()
+        if self.conn and self.conn.is_connected():
+            self.conn.close()
 
-    def get_or_create_joueur(self, pseudo, email="", est_ia=False):
-        cursor = None
+    def _ensure_connected(self):
+        """Reconnecte si la connexion est perdue."""
         try:
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT id FROM joueurs WHERE pseudo = %s", (pseudo,))
-            result = cursor.fetchone()
-            if result:
-                return result[0]
-            cursor.execute(
-                "INSERT INTO joueurs (pseudo, email, est_ia) VALUES (%s, %s, %s)",
-                (pseudo, email if email else f"{pseudo}@local.com", est_ia)
-            )
-            self.connection.commit()
-            return cursor.lastrowid
-        except Exception as e:
-            print(f"❌ Erreur get_or_create_joueur : {e}")
+            if self.conn and self.conn.is_connected():
+                return True
+        except Exception:
+            pass
+        return self.connect()
+
+    # ──────────────────────────────────────────
+    #  SCHÉMA
+    # ──────────────────────────────────────────
+
+    def _init_schema(self):
+        """Crée les tables si elles n'existent pas."""
+        ddl = """
+        CREATE TABLE IF NOT EXISTS joueurs (
+            id               INT AUTO_INCREMENT PRIMARY KEY,
+            pseudo           VARCHAR(50) NOT NULL UNIQUE,
+            est_ia           BOOLEAN DEFAULT FALSE,
+            date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_pseudo (pseudo)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+        CREATE TABLE IF NOT EXISTS parties (
+            id               INT AUTO_INCREMENT PRIMARY KEY,
+            joueur1_id       INT NOT NULL,
+            joueur2_id       INT NOT NULL,
+            gagnant_id       INT,
+            sequence_coups   VARCHAR(200) NOT NULL,
+            hash_partie      VARCHAR(64) UNIQUE,
+            mode_jeu         VARCHAR(20) DEFAULT 'pvp',
+            nb_lignes        TINYINT DEFAULT 9,
+            nb_colonnes      TINYINT DEFAULT 9,
+            nb_coups         TINYINT DEFAULT 0,
+            statut           ENUM('en_cours','terminee','abandonnee') DEFAULT 'terminee',
+            date_debut       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (joueur1_id) REFERENCES joueurs(id) ON DELETE CASCADE,
+            FOREIGN KEY (joueur2_id) REFERENCES joueurs(id) ON DELETE CASCADE,
+            FOREIGN KEY (gagnant_id) REFERENCES joueurs(id) ON DELETE SET NULL,
+            INDEX idx_date (date_debut)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+        CREATE TABLE IF NOT EXISTS coups (
+            id          INT AUTO_INCREMENT PRIMARY KEY,
+            partie_id   INT NOT NULL,
+            numero_coup TINYINT NOT NULL,
+            colonne     TINYINT NOT NULL,
+            joueur_id   INT NOT NULL,
+            FOREIGN KEY (partie_id) REFERENCES parties(id) ON DELETE CASCADE,
+            FOREIGN KEY (joueur_id) REFERENCES joueurs(id) ON DELETE CASCADE,
+            UNIQUE KEY unique_coup (partie_id, numero_coup)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        """
+        try:
+            cur = self.conn.cursor()
+            for stmt in [s.strip() for s in ddl.split(';') if s.strip()]:
+                cur.execute(stmt)
+            self.conn.commit()
+            cur.close()
+        except Error as e:
+            print(f"⚠️ Schema init: {e}")
+
+    # ──────────────────────────────────────────
+    #  JOUEURS
+    # ──────────────────────────────────────────
+
+    def get_or_create_joueur(self, pseudo, est_ia=False):
+        if not self._ensure_connected():
             return None
-        finally:
-            if cursor:
-                cursor.close()
-
-    def import_partie_from_sequence(self, sequence, joueur1_id=None, joueur2_id=None,
-                                     nb_colonnes=7, nb_lignes=6):
-        cursor = None
         try:
-            hash_partie = hashlib.md5(sequence.encode()).hexdigest()
-            sequence_sym = self.calculer_symetrique(sequence, nb_colonnes)
-            hash_sym = hashlib.md5(sequence_sym.encode()).hexdigest()
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT id FROM parties WHERE hash_partie = %s", (hash_partie,))
-            existing = cursor.fetchone()
-            if existing:
-                return {'status': 'exists', 'partie_id': existing[0]}
-            cursor.execute("SELECT id FROM parties WHERE hash_partie = %s", (hash_sym,))
-            existing_sym = cursor.fetchone()
-            if existing_sym:
-                return {'status': 'symetrique', 'partie_id': existing_sym[0]}
-            if not joueur1_id:
-                joueur1_id = self.get_or_create_joueur("Joueur1")
-            if not joueur2_id:
-                joueur2_id = self.get_or_create_joueur("Joueur2")
-            gagnant_id = self.simuler_partie(sequence, joueur1_id, joueur2_id,
-                                              nb_lignes=nb_lignes, nb_colonnes=nb_colonnes)
-            cursor.execute(
-                """INSERT INTO parties (joueur1_id, joueur2_id, gagnant_id, sequence_coups,
-                   hash_partie, statut, nb_lignes, nb_colonnes)
-                   VALUES (%s, %s, %s, %s, %s, 'terminee', %s, %s)""",
-                (joueur1_id, joueur2_id, gagnant_id, sequence, hash_partie, nb_lignes, nb_colonnes)
+            cur = self.conn.cursor()
+            cur.execute("SELECT id FROM joueurs WHERE pseudo = %s", (pseudo,))
+            row = cur.fetchone()
+            if row:
+                cur.close()
+                return row[0]
+            cur.execute(
+                "INSERT INTO joueurs (pseudo, est_ia) VALUES (%s, %s)",
+                (pseudo, est_ia)
             )
-            self.connection.commit()
-            partie_id = cursor.lastrowid
-            joueur_courant_id = joueur1_id
-            for i, col_str in enumerate(sequence):
-                col = int(col_str)
-                cursor.execute(
-                    "INSERT INTO coups (partie_id, numero_coup, colonne, joueur_id) VALUES (%s, %s, %s, %s)",
-                    (partie_id, i + 1, col, joueur_courant_id)
-                )
-                joueur_courant_id = joueur2_id if joueur_courant_id == joueur1_id else joueur1_id
-            self.connection.commit()
-            return {'status': 'created', 'partie_id': partie_id}
-        except Exception as e:
-            print(f"❌ Erreur import_partie : {e}")
-            return {'status': 'error', 'message': str(e)}
-        finally:
-            if cursor:
-                cursor.close()
+            self.conn.commit()
+            jid = cur.lastrowid
+            cur.close()
+            return jid
+        except Error as e:
+            print(f"❌ get_or_create_joueur: {e}")
+            return None
 
-    def calculer_symetrique(self, sequence, nb_colonnes=7):
+    # ──────────────────────────────────────────
+    #  PARTIES
+    # ──────────────────────────────────────────
+
+    def save_partie(self, joueur1, joueur2, sequence, mode='pvp',
+                    gagnant=None, nb_lignes=9, nb_colonnes=9):
+        """
+        Sauvegarde une partie.
+        joueur1, joueur2, gagnant = pseudos (str).
+        sequence = "345671..." (colonnes jouées, 0-indexed).
+        Retourne partie_id ou None.
+        """
         if not sequence:
-            return ""
-        return ''.join(str(nb_colonnes - 1 - int(c)) for c in sequence)
-
-    def simuler_partie(self, sequence, joueur1_id, joueur2_id, nb_lignes=6, nb_colonnes=7):
-        plateau = [[' '] * nb_colonnes for _ in range(nb_lignes)]
-        joueur_courant = 'X'
-        for col_str in sequence:
-            col = int(col_str)
-            if col < 0 or col >= nb_colonnes:
-                continue
-            for row in range(nb_lignes - 1, -1, -1):
-                if plateau[row][col] == ' ':
-                    plateau[row][col] = joueur_courant
-                    break
-            if self.check_win(plateau, joueur_courant, nb_lignes, nb_colonnes):
-                return joueur1_id if joueur_courant == 'X' else joueur2_id
-            joueur_courant = 'O' if joueur_courant == 'X' else 'X'
-        return None
-
-    def check_win(self, plateau, joueur, nb_lignes=6, nb_colonnes=7):
-        for r in range(nb_lignes):
-            for c in range(nb_colonnes - 3):
-                if all(plateau[r][c + i] == joueur for i in range(4)):
-                    return True
-        for c in range(nb_colonnes):
-            for r in range(nb_lignes - 3):
-                if all(plateau[r + i][c] == joueur for i in range(4)):
-                    return True
-        for r in range(nb_lignes - 3):
-            for c in range(nb_colonnes - 3):
-                if all(plateau[r + i][c + i] == joueur for i in range(4)):
-                    return True
-        for r in range(3, nb_lignes):
-            for c in range(nb_colonnes - 3):
-                if all(plateau[r - i][c + i] == joueur for i in range(4)):
-                    return True
-        return False
-
-    def get_all_parties(self):
-        cursor = None
-        try:
-            cursor = self.connection.cursor(dictionary=True)
-            cursor.execute(
-                """SELECT p.*, j1.pseudo as joueur1_pseudo, j2.pseudo as joueur2_pseudo,
-                   jg.pseudo as gagnant_pseudo FROM parties p
-                   JOIN joueurs j1 ON p.joueur1_id = j1.id
-                   JOIN joueurs j2 ON p.joueur2_id = j2.id
-                   LEFT JOIN joueurs jg ON p.gagnant_id = jg.id
-                   ORDER BY p.date_debut DESC"""
-            )
-            return cursor.fetchall()
-        except Exception as e:
-            print(f"❌ Erreur get_all_parties : {e}")
-            return []
-        finally:
-            if cursor:
-                cursor.close()
-
-    def get_partie_coups(self, partie_id):
-        cursor = None
-        try:
-            cursor = self.connection.cursor(dictionary=True)
-            cursor.execute(
-                """SELECT c.*, j.pseudo as joueur_pseudo FROM coups c
-                   JOIN joueurs j ON c.joueur_id = j.id
-                   WHERE c.partie_id = %s ORDER BY c.numero_coup""",
-                (partie_id,)
-            )
-            return cursor.fetchall()
-        except Exception as e:
-            return []
-        finally:
-            if cursor:
-                cursor.close()
-
-    def get_stats_joueur(self, joueur_id):
-        cursor = None
-        try:
-            cursor = self.connection.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM stats_joueurs WHERE id = %s", (joueur_id,))
-            return cursor.fetchone()
-        except Exception as e:
             return None
-        finally:
-            if cursor:
-                cursor.close()
+        if not self._ensure_connected():
+            return None
 
-    def save_partie_complete(self, joueur1_id, joueur2_id, gagnant_id, sequence, duree=0,
-                              nb_lignes=6, nb_colonnes=7):
-        cursor = None
+        hash_p = hashlib.md5(sequence.encode()).hexdigest()
+
         try:
-            if not sequence:
-                return None
-            hash_partie = hashlib.md5(sequence.encode()).hexdigest()
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT id FROM parties WHERE hash_partie = %s", (hash_partie,))
-            existing = cursor.fetchone()
+            cur = self.conn.cursor()
+            cur.execute("SELECT id FROM parties WHERE hash_partie = %s", (hash_p,))
+            existing = cur.fetchone()
             if existing:
+                cur.close()
                 return existing[0]
-            cursor.execute(
-                """INSERT INTO parties (joueur1_id, joueur2_id, gagnant_id, duree_secondes,
-                   statut, sequence_coups, hash_partie, nb_lignes, nb_colonnes)
-                   VALUES (%s, %s, %s, %s, 'terminee', %s, %s, %s, %s)""",
-                (joueur1_id, joueur2_id, gagnant_id, duree, sequence, hash_partie, nb_lignes, nb_colonnes)
-            )
-            self.connection.commit()
-            partie_id = cursor.lastrowid
-            joueur_courant_id = joueur1_id
-            for i, col_str in enumerate(sequence):
-                col = int(col_str)
-                cursor.execute(
-                    "INSERT INTO coups (partie_id, numero_coup, colonne, joueur_id) VALUES (%s, %s, %s, %s)",
-                    (partie_id, i + 1, col, joueur_courant_id)
-                )
-                joueur_courant_id = joueur2_id if joueur_courant_id == joueur1_id else joueur1_id
-            self.connection.commit()
-            return partie_id
-        except Exception as e:
-            print(f"❌ Erreur save_partie_complete : {e}")
-            if self.connection:
-                self.connection.rollback()
-            return None
-        finally:
-            if cursor:
-                cursor.close()
 
-    def save_coup(self, partie_id, numero_coup, colonne, joueur_id, temps_reflexion=0):
-        cursor = None
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute(
-                "INSERT INTO coups (partie_id, numero_coup, colonne, joueur_id) VALUES (%s, %s, %s, %s)",
-                (partie_id, numero_coup, colonne, joueur_id)
-            )
-            self.connection.commit()
-            return cursor.lastrowid
-        except Exception as e:
-            return None
-        finally:
-            if cursor:
-                cursor.close()
-
-    def update_position_stats(self, sequence, gagnant_id, joueur1_id, joueur2_id,
-                               nb_lignes=6, nb_colonnes=7):
-        try:
-            cursor = self.connection.cursor(dictionary=True)
-            plateau = [[' '] * nb_colonnes for _ in range(nb_lignes)]
-            joueur = 'X'
-            for col_str in sequence:
-                col = int(col_str)
-                for row in range(nb_lignes - 1, -1, -1):
-                    if plateau[row][col] == ' ':
-                        plateau[row][col] = joueur
-                        break
-                plateau_json = json.dumps(plateau)
-                hash_pos = hashlib.md5(plateau_json.encode()).hexdigest()
-                joueur_suivant = 'O' if joueur == 'X' else 'X'
-                cursor.execute(
-                    "SELECT victoires_x, victoires_o, nuls, nb_parties FROM positions WHERE hash_position = %s",
-                    (hash_pos,)
-                )
-                pos = cursor.fetchone()
-                if pos:
-                    vx = pos['victoires_x'] + (1 if gagnant_id == joueur1_id else 0)
-                    vo = pos['victoires_o'] + (1 if gagnant_id == joueur2_id else 0)
-                    nu = pos['nuls'] + (1 if gagnant_id is None else 0)
-                    nb = pos['nb_parties'] + 1
-                    cursor.execute(
-                        "UPDATE positions SET victoires_x=%s, victoires_o=%s, nuls=%s, nb_parties=%s WHERE hash_position=%s",
-                        (vx, vo, nu, nb, hash_pos)
-                    )
-                else:
-                    vx = 1 if gagnant_id == joueur1_id else 0
-                    vo = 1 if gagnant_id == joueur2_id else 0
-                    nu = 1 if gagnant_id is None else 0
-                    cursor.execute(
-                        """INSERT INTO positions (hash_position, plateau, nb_lignes, nb_colonnes,
-                           joueur_suivant, nb_parties, victoires_x, victoires_o, nuls)
-                           VALUES (%s, %s, %s, %s, %s, 1, %s, %s, %s)""",
-                        (hash_pos, plateau_json, nb_lignes, nb_colonnes, joueur_suivant, vx, vo, nu)
-                    )
-                joueur = joueur_suivant
-            self.connection.commit()
-            cursor.close()
-        except Exception as e:
-            print(f"⚠️ Erreur update_position_stats : {e}")
-
-    # ==================== MÉTHODES POUR BGA SCRAPER ====================
-
-    def check_if_sequence_exists(self, sequence):
-        cursor = None
-        try:
-            hash_partie = hashlib.md5(sequence.encode()).hexdigest()
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT id FROM parties WHERE hash_partie = %s", (hash_partie,))
-            return cursor.fetchone() is not None
-        except Exception as e:
-            print(f"❌ Erreur check_if_sequence_exists : {e}")
-            return False
-        finally:
-            if cursor:
-                cursor.close()
-
-    def create_game(self, rows=6, cols=7, mode=1, confidence=1):
-        cursor = None
-        try:
-            ia_id = self.get_or_create_joueur("BGA_Player1", est_ia=False)
-            ia2_id = self.get_or_create_joueur("BGA_Player2", est_ia=False)
-            cursor = self.connection.cursor()
-            cursor.execute(
-                """INSERT INTO parties (joueur1_id, joueur2_id, gagnant_id, sequence_coups,
-                   hash_partie, statut, confiance, nb_lignes, nb_colonnes)
-                   VALUES (%s, %s, NULL, '', '', 'en_cours', %s, %s, %s)""",
-                (ia_id, ia2_id, confidence, rows, cols)
-            )
-            self.connection.commit()
-            return cursor.lastrowid
-        except Exception as e:
-            print(f"❌ Erreur create_game : {e}")
-            return None
-        finally:
-            if cursor:
-                cursor.close()
-
-    def save_move(self, game_id, numero_coup, row, col, joueur_num):
-        cursor = None
-        try:
-            pseudo = "BGA_Player1" if joueur_num == 1 else "BGA_Player2"
-            joueur_id = self.get_or_create_joueur(pseudo)
-            cursor = self.connection.cursor()
-            cursor.execute(
-                "INSERT INTO coups (partie_id, numero_coup, colonne, joueur_id) VALUES (%s, %s, %s, %s)",
-                (game_id, numero_coup, col, joueur_id)
-            )
-            self.connection.commit()
-            return cursor.lastrowid
-        except Exception as e:
-            print(f"❌ Erreur save_move : {e}")
-            return None
-        finally:
-            if cursor:
-                cursor.close()
-
-    def update_game_result(self, game_id, winner=None):
-        cursor = None
-        try:
-            cursor = self.connection.cursor(dictionary=True)
-            cursor.execute(
-                "SELECT colonne FROM coups WHERE partie_id = %s ORDER BY numero_coup",
-                (game_id,)
-            )
-            coups = cursor.fetchall()
-            sequence = ''.join(str(c['colonne']) for c in coups)
-            hash_partie = hashlib.md5(sequence.encode()).hexdigest()
+            j1_id = self.get_or_create_joueur(joueur1, est_ia=(mode == 'iavsia'))
+            j2_id = self.get_or_create_joueur(joueur2, est_ia=(mode in ('pvia', 'iavsia')))
             gagnant_id = None
-            if winner is not None:
-                pseudo = "BGA_Player1" if winner == 1 else "BGA_Player2"
-                gagnant_id = self.get_or_create_joueur(pseudo)
-            cursor.execute(
-                """UPDATE parties SET gagnant_id=%s, sequence_coups=%s,
-                   hash_partie=%s, statut='terminee' WHERE id=%s""",
-                (gagnant_id, sequence, hash_partie, game_id)
-            )
-            self.connection.commit()
-            return True
-        except Exception as e:
-            print(f"❌ Erreur update_game_result : {e}")
-            return False
-        finally:
-            if cursor:
-                cursor.close()
+            if gagnant == joueur1:
+                gagnant_id = j1_id
+            elif gagnant == joueur2:
+                gagnant_id = j2_id
 
-    def delete_partie(self, partie_id):
-        cursor = None
+            cur.execute(
+                """INSERT INTO parties
+                   (joueur1_id, joueur2_id, gagnant_id, sequence_coups,
+                    hash_partie, mode_jeu, nb_lignes, nb_colonnes, nb_coups, statut)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'terminee')""",
+                (j1_id, j2_id, gagnant_id, sequence, hash_p, mode,
+                 nb_lignes, nb_colonnes, len(sequence))
+            )
+            self.conn.commit()
+            partie_id = cur.lastrowid
+
+            # Coups
+            j_cur_id = j1_id
+            for i, col_str in enumerate(sequence):
+                cur.execute(
+                    "INSERT INTO coups (partie_id, numero_coup, colonne, joueur_id)"
+                    " VALUES (%s,%s,%s,%s)",
+                    (partie_id, i + 1, int(col_str), j_cur_id)
+                )
+                j_cur_id = j2_id if j_cur_id == j1_id else j1_id
+            self.conn.commit()
+            cur.close()
+            return partie_id
+
+        except Error as e:
+            print(f"❌ save_partie: {e}")
+            try:
+                self.conn.rollback()
+            except Exception:
+                pass
+            return None
+
+    # ──────────────────────────────────────────
+    #  LECTURE
+    # ──────────────────────────────────────────
+
+    def get_all_parties(self, limit=200):
+        if not self._ensure_connected():
+            return []
         try:
-            cursor = self.connection.cursor()
-            cursor.execute("DELETE FROM parties WHERE id = %s", (partie_id,))
-            self.connection.commit()
-            return cursor.rowcount > 0
-        except Exception as e:
-            if self.connection:
-                self.connection.rollback()
-            return False
-        finally:
-            if cursor:
-                cursor.close()
+            cur = self.conn.cursor(dictionary=True)
+            cur.execute("""
+                SELECT p.id, p.mode_jeu, p.statut,
+                       p.nb_coups, p.nb_lignes, p.nb_colonnes,
+                       p.sequence_coups, p.date_debut,
+                       j1.pseudo  AS joueur1,
+                       j2.pseudo  AS joueur2,
+                       jg.pseudo  AS gagnant
+                FROM parties p
+                JOIN joueurs j1 ON p.joueur1_id = j1.id
+                JOIN joueurs j2 ON p.joueur2_id = j2.id
+                LEFT JOIN joueurs jg ON p.gagnant_id = jg.id
+                ORDER BY p.date_debut DESC
+                LIMIT %s
+            """, (limit,))
+            rows = cur.fetchall()
+            cur.close()
+            # Convertir datetime en string
+            for r in rows:
+                if r.get('date_debut'):
+                    r['date_debut'] = r['date_debut'].strftime('%d/%m/%Y %H:%M')
+            return rows
+        except Error as e:
+            print(f"❌ get_all_parties: {e}")
+            return []
+
+    def get_partie_detail(self, partie_id):
+        if not self._ensure_connected():
+            return None
+        try:
+            cur = self.conn.cursor(dictionary=True)
+            cur.execute("""
+                SELECT p.*, j1.pseudo AS joueur1, j2.pseudo AS joueur2,
+                       jg.pseudo AS gagnant
+                FROM parties p
+                JOIN joueurs j1 ON p.joueur1_id = j1.id
+                JOIN joueurs j2 ON p.joueur2_id = j2.id
+                LEFT JOIN joueurs jg ON p.gagnant_id = jg.id
+                WHERE p.id = %s
+            """, (partie_id,))
+            partie = cur.fetchone()
+            if not partie:
+                cur.close()
+                return None
+            if partie.get('date_debut'):
+                partie['date_debut'] = partie['date_debut'].strftime('%d/%m/%Y %H:%M')
+
+            cur.execute("""
+                SELECT c.numero_coup, c.colonne, j.pseudo AS joueur
+                FROM coups c
+                JOIN joueurs j ON c.joueur_id = j.id
+                WHERE c.partie_id = %s
+                ORDER BY c.numero_coup
+            """, (partie_id,))
+            partie['coups'] = cur.fetchall()
+            cur.close()
+            return partie
+        except Error as e:
+            print(f"❌ get_partie_detail: {e}")
+            return None
+
+    def get_global_stats(self):
+        if not self._ensure_connected():
+            return {'parties': 0, 'joueurs': 0}
+        try:
+            cur = self.conn.cursor()
+            cur.execute("SELECT COUNT(*) FROM parties WHERE statut='terminee'")
+            nb_p = cur.fetchone()[0]
+            cur.execute("SELECT COUNT(*) FROM joueurs")
+            nb_j = cur.fetchone()[0]
+            cur.close()
+            return {'parties': nb_p, 'joueurs': nb_j}
+        except Error as e:
+            return {'parties': 0, 'joueurs': 0}
+
+    def get_leaderboard(self, limit=10):
+        if not self._ensure_connected():
+            return []
+        try:
+            cur = self.conn.cursor(dictionary=True)
+            cur.execute("""
+                SELECT j.pseudo, j.est_ia,
+                       COUNT(DISTINCT p.id) AS total_parties,
+                       SUM(CASE WHEN p.gagnant_id = j.id THEN 1 ELSE 0 END) AS victoires
+                FROM joueurs j
+                LEFT JOIN parties p ON (p.joueur1_id=j.id OR p.joueur2_id=j.id)
+                GROUP BY j.id, j.pseudo, j.est_ia
+                ORDER BY victoires DESC
+                LIMIT %s
+            """, (limit,))
+            rows = cur.fetchall()
+            cur.close()
+            return rows
+        except Error as e:
+            print(f"❌ get_leaderboard: {e}")
+            return []
+
 

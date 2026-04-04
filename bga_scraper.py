@@ -21,7 +21,7 @@ ROWS = 8
 COLS = 9
 
 # --- DATABASE INITIALIZATION ---
-db = DatabaseManager(host="localhost", user="root", password="galou1646", database="puissance4")
+db = DatabaseManager(host="localhost", user="root", password="Galou1646!", database="puissance4")
 db.connect()
 
 def load_queue():
