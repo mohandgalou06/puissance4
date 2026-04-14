@@ -127,10 +127,20 @@ def play():
     """Gère un coup joué par un humain ou par l'IA."""
     data = request.get_json(silent=True) or {}
     tab_id = data.get("tab_id", "default")
-    action = data.get("action") 
-    
+    action = data.get("action")
+
     logic, historique = charger_partie(tab_id)
+
+    couleur_forcee = data.get("color")
+    try:
+        couleur_forcee = int(couleur_forcee) if couleur_forcee is not None else None
+    except (TypeError, ValueError):
+        couleur_forcee = None
+
     joueur_actuel = prochain_joueur(historique)
+    if action == "analyze" and couleur_forcee in (ROUGE, JAUNE):
+        joueur_actuel = couleur_forcee
+
     nom_joueur = "Rouge" if joueur_actuel == ROUGE else "Jaune"
 
     vainqueur = None
@@ -156,13 +166,14 @@ def play():
         else:
             return construire_reponse(logic, historique, status="error")
 
-    elif action == "ia":
+    elif action == "ia" or  action == "analyze":
         # NOUVEAU : Instance locale pour isoler les calculs par requête
+        budget_client = float(data.get("budget", 14.0))
         ia_terminator = IA_Tournoi()
-        ia_terminator.budget_secondes = 14.0
+        ia_terminator.budget_secondes = budget_client
         ia_terminator.max_profondeur = 17
 
-        col_ia = ia_terminator.jouer_coup(logic, historique, joueur_actuel)
+        col_ia = ia_terminator.jouer_coup(logic, historique, joueur_actuel,tab_id=tab_id)
         message_ia = getattr(ia_terminator, "dernier_message", "")
 
         if col_ia is not None and logic.colonne_valide(col_ia):
@@ -189,6 +200,22 @@ def play():
         winning_cells=winning_cells, 
         message_ia=message_ia
     )
+
+@app.route("/ai_status", methods=["POST"])
+def ai_status():
+    """Route appelée par le navigateur pour lire la profondeur de l'IA en direct."""
+    data = request.get_json(silent=True) or {}
+    tab_id = data.get("tab_id", "default")
+    chemin = os.path.join(SAVE_DIR, f"{tab_id}_status.json")
+    
+    try:
+        if os.path.exists(chemin):
+            with open(chemin, 'r') as f:
+                return jsonify(json.load(f))
+    except:
+        pass
+    
+    return jsonify({"depth": 0})
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
