@@ -201,14 +201,21 @@ class IA_Tournoi:
 
         prof_atteinte = generateur_tournoi.LAST_COMPLETED_DEPTH
 
+        infos_mat = self._extraire_infos_mat(score, prof_atteinte)
+
         if score is None:
-            self.dernier_message = "Analyse terminee."
-        elif score > 9_000_000:
-            self.dernier_message = f"Mat trouve. Profondeur completee: {prof_atteinte}."
-        elif score < -9_000_000:
-            self.dernier_message = f"Defaite forcee detectee. Profondeur completee: {prof_atteinte}."
+            self.dernier_message = "Analyse terminee sans resultat exploitable."
+        elif infos_mat is not None:
+            self.dernier_message = (
+                f"Solution trouvee : {infos_mat['gagnant']} gagne en "
+                f"{infos_mat['demi_coups']} demi-coups "
+                f"(~ {infos_mat['coups']} coup(s)). "
+                f"Profondeur completee : {prof_atteinte}."
+            )
         else:
-            self.dernier_message = f"Analyse terminee. Profondeur completee: {prof_atteinte}."
+            self.dernier_message = (
+                f"Aucune victoire forcee trouvee jusqu'a la profondeur {prof_atteinte}."
+            )
 
         if colonne is None or not logic.colonne_valide(colonne):
             cols = [c for c in range(9) if logic.colonne_valide(c)]
@@ -216,6 +223,48 @@ class IA_Tournoi:
 
         self.memoriser_coup(logic, joueur_ia, colonne)
         return colonne
+    
+    def analyser_position(self, logic, joueur_ia, tab_id=None):
+        self.utiliser_bdd = False
+        self.memoire_coups.clear()
+
+        colonne, score = minimax_iteratif(
+            logic,
+            est_maximisant=(joueur_ia == JAUNE),
+            max_profondeur=self.max_profondeur,
+            budget_secondes=self.budget_secondes,
+            tab_id=tab_id
+        )
+
+        prof_atteinte = generateur_tournoi.LAST_COMPLETED_DEPTH
+
+        if score is None:
+            self.dernier_message = "Analyse terminee sans resultat exploitable."
+            return colonne, score
+
+        if score > 9_000_000:
+            self.dernier_message = f"Victoire forcee pour Jaune prouvee. Profondeur completee : {prof_atteinte}."
+        elif score < -9_000_000:
+            self.dernier_message = f"Victoire forcee pour Rouge prouvee. Profondeur completee : {prof_atteinte}."
+        else:
+            self.dernier_message = f"Aucune victoire forcee prouvee jusqu'a la profondeur {prof_atteinte}."
+
+        return colonne, score
+
+    def _extraire_infos_mat(self, score, profondeur_completee):
+        if score is None or abs(score) < 9_000_000:
+            return None
+
+        reste = max(0, (abs(score) - 10_000_000) // 1000)
+        demi_coups = max(1, profondeur_completee - reste)
+        coups = (demi_coups + 1) // 2  # approximation en "coups"
+        gagnant = "Jaune" if score > 0 else "Rouge"
+
+        return {
+            "gagnant": gagnant,
+            "demi_coups": int(demi_coups),
+            "coups": int(coups),
+        }
 
 
 _mon_ia_tournoi = IA_Tournoi()
