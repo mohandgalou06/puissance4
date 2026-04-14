@@ -1,6 +1,8 @@
 import random
 import time
 from constants import ROUGE, JAUNE
+import json
+import os
 
 # =========================
 # ETAT GLOBAL / DEBUG
@@ -8,7 +10,7 @@ from constants import ROUGE, JAUNE
 CURRENT_DEPTH = 0
 LAST_COMPLETED_DEPTH = 0
 CACHE_MINIMAX = {}
-CACHE_MAX_SIZE = 500_000
+CACHE_MAX_SIZE = 100_000
 
 # =========================
 # ZOBRIST
@@ -380,7 +382,7 @@ def minimax(
 # =========================
 # ITERATIVE DEEPENING
 # =========================
-def minimax_iteratif(logic, est_maximisant=True, max_profondeur=10, budget_secondes=2.0):
+def minimax_iteratif(logic, est_maximisant=True, max_profondeur=10, budget_secondes=2.0, tab_id=None):
     global CURRENT_DEPTH, LAST_COMPLETED_DEPTH, CACHE_MINIMAX, KILLER_MOVES, HISTORY_HEURISTIC
 
     CURRENT_DEPTH = 0
@@ -396,6 +398,13 @@ def minimax_iteratif(logic, est_maximisant=True, max_profondeur=10, budget_secon
 
     for prof in range(1, max_profondeur + 1):
         CURRENT_DEPTH = prof
+        if tab_id:
+            try:
+                os.makedirs("sauvegardes", exist_ok=True)
+                with open(f"sauvegardes/{tab_id}_status.json", "w") as f:
+                    json.dump({"depth": prof}, f)
+            except:
+                pass
         try:
             col, score = minimax(
                 logic,
