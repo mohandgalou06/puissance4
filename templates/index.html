@@ -168,7 +168,8 @@
                 <button class="btn" style="padding: 10px; width: auto; background-color: #ffb327; color: rgb(255, 255, 255);" onclick="resetGame()">🔄 Recommencer</button>
                 
                 <button id="btn-paint-toggle" class="btn" style="padding: 10px; width: auto; background-color: #7d06cc; color: white;" onclick="togglePaintMode()">🖌️ Mode Peinture</button>
-                <button id="btn-save-game" class="btn" style="padding: 10px; width: auto; background-color: #16a085; color: white;" onclick="saveCurrentGame()">💾 Enregistrer</button>   
+                <button id="btn-save-game" class="btn" style="padding: 10px; width: auto; background-color: #16a085; color: white;" onclick="saveCurrentGame()">💾 Enregistrer DB</button>
+                <button id="btn-export-txt" class="btn" style="padding: 10px; width: auto; background-color: #2980b9; color: white;" onclick="exportGameTxt()">💾 .txt</button>   
                 <div id="paint-tools" style="display: none; gap: 10px; align-items: center;">
                     <button id="btn-eraser" class="btn" style="padding: 10px; width: auto; background-color: #4a4a4a; color: white; border: 2px solid transparent;" onclick="toggleEraser()">⚫ Gomme</button>
                     <button class="btn" style="padding: 10px; width: auto; background-color: #3498db; color: white; font-weight: bold;" onclick="analyzeBoard()">🔍 Analyser</button>
@@ -831,6 +832,50 @@ async function saveCurrentGame() {
         }
     } catch (e) {
         document.getElementById('ia-msg').innerText = "Erreur lors de l'enregistrement.";
+        document.getElementById('ia-msg').style.color = "#e94560";
+    }
+}
+
+async function exportGameTxt() {
+    try {
+        const res = await fetch('/play', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'get_grid',
+                tab_id: TAB_ID
+            })
+        });
+
+        const data = await res.json();
+        const historique = data.historique || [];
+
+        if (!historique.length) {
+            document.getElementById('ia-msg').innerText = "Aucune partie à exporter.";
+            document.getElementById('ia-msg').style.color = "#e94560";
+            return;
+        }
+
+        // Colonnes internes 0-8 -> export utilisateur 1-9
+        const sequence = historique.map(coup => String(coup[1] + 1)).join('');
+        const nomFichier = `${sequence}.txt`;
+
+        const blob = new Blob([sequence], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = nomFichier;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+
+        document.getElementById('ia-msg').innerText = `Fichier exporté : ${nomFichier}`;
+        document.getElementById('ia-msg').style.color = "#00ff88";
+    } catch (e) {
+        document.getElementById('ia-msg').innerText = "Erreur lors de l'export .txt.";
         document.getElementById('ia-msg').style.color = "#e94560";
     }
 }
