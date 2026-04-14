@@ -124,7 +124,7 @@ def paint():
 
 @app.route("/play", methods=["POST"])
 def play():
-    """Gère un coup joué par un humain ou par l'IA."""
+    """Gère un coup joué par un humain, par l'IA, ou une analyse non destructive."""
     data = request.get_json(silent=True) or {}
     tab_id = data.get("tab_id", "default")
     action = data.get("action")
@@ -138,6 +138,8 @@ def play():
         couleur_forcee = None
 
     joueur_actuel = prochain_joueur(historique)
+
+    # En mode analyse, on respecte la couleur choisie côté front si elle est fournie
     if action == "analyze" and couleur_forcee in (ROUGE, JAUNE):
         joueur_actuel = couleur_forcee
 
@@ -149,57 +151,104 @@ def play():
     winning_cells = None
     message_ia = ""
 
+    # -------------------------------------------------
+    # 1) Coup humain
+    # -------------------------------------------------
     if action == "human":
         col = data.get("colonne")
-        if col is not None and logic.colonne_valide(col):
-            l = logic.placer_pion(col, joueur_actuel)
-            historique.append([l, col, joueur_actuel])
-            
-            if logic.victoire(joueur_actuel):
-                vainqueur = nom_joueur
-                winner_color = joueur_actuel
-                winner_type = "human"
-                winning_cells = [list(pos) for pos in logic.aligne]
-            elif logic.grille_pleine():
-                vainqueur = "Nul"
-                winner_type = "draw"
-        else:
+
+        if col is None or not logic.colonne_valide(col):
             return construire_reponse(logic, historique, status="error")
 
-    elif action == "ia" or  action == "analyze":
-        # NOUVEAU : Instance locale pour isoler les calculs par requête
+        l = logic.placer_pion(col, joueur_actuel)
+        historique.append([l, col, joueur_actuel])
+
+        if logic.victoire(joueur_actuel):
+            vainqueur = nom_joueur
+            winner_color = joueur_actuel
+            winner_type = "human"
+            winning_cells = [list(pos) for pos in logic.aligne]
+        elif logic.grille_pleine():
+            vainqueur = "Nul"
+            winner_type = "draw"
+
+        sauvegarder_partie(tab_id, logic, historique)
+        return construire_reponse(
+            logic, historique,
+            vainqueur=vainqueur,
+            winner_color=winner_color,
+            winner_type=winner_type,
+            winning_cells=winning_cells,
+            message_ia=message_ia
+        )
+
+    # -------------------------------------------------
+    # 2) Analyse NON destructive
+    # -------------------------------------------------
+    elif action == "analyze":
         budget_client = float(data.get("budget", 14.0))
+
+        ia_terminator = IA_Tournoi()
+        ia_terminator.budget_secondes = budget_client
+        ia_terminator.max_profondeur = 25
+
+        _, _score = ia_terminator.analyser_position(logic, joueur_actuel, tab_id=tab_id)
+        message_ia = getattr(ia_terminator, "dernier_message", "")
+
+        return construire_reponse(
+            logic, historique,
+            message_ia=message_ia,
+            status="ok"
+        )
+
+    # -------------------------------------------------
+    # 3) Coup IA réel
+    # -------------------------------------------------
+    elif action == "ia":
+        budget_client = float(data.get("budget", 14.0))
+
         ia_terminator = IA_Tournoi()
         ia_terminator.budget_secondes = budget_client
         ia_terminator.max_profondeur = 17
 
-        col_ia = ia_terminator.jouer_coup(logic, historique, joueur_actuel,tab_id=tab_id)
+        col_ia = ia_terminator.jouer_coup(logic, historique, joueur_actuel, tab_id=tab_id)
         message_ia = getattr(ia_terminator, "dernier_message", "")
 
-        if col_ia is not None and logic.colonne_valide(col_ia):
-            l = logic.placer_pion(col_ia, joueur_actuel)
-            historique.append([l, col_ia, joueur_actuel])
-            
-            if logic.victoire(joueur_actuel):
-                vainqueur = nom_joueur
-                winner_color = joueur_actuel
-                winner_type = "ia"
-                winning_cells = [list(pos) for pos in logic.aligne]
-            elif logic.grille_pleine():
-                vainqueur = "Nul"
-                winner_type = "draw"
-        else:
+        if col_ia is None or not logic.colonne_valide(col_ia):
             return construire_reponse(logic, historique, message_ia=message_ia, status="invalid")
 
-    sauvegarder_partie(tab_id, logic, historique)
-    return construire_reponse(
-        logic, historique, 
-        vainqueur=vainqueur, 
-        winner_color=winner_color, 
-        winner_type=winner_type, 
-        winning_cells=winning_cells, 
-        message_ia=message_ia
-    )
+        l = logic.placer_pion(col_ia, joueur_actuel)
+        historique.append([l, col_ia, joueur_actuel])
+
+        if logic.victoire(joueur_actuel):
+            vainqueur = nom_joueur
+            winner_color = joueur_actuel
+            winner_type = "ia"
+            winning_cells = [list(pos) for pos in logic.aligne]
+        elif logic.grille_pleine():
+            vainqueur = "Nul"
+            winner_type = "draw"
+
+        sauvegarder_partie(tab_id, logic, historique)
+        return construire_reponse(
+            logic, historique,
+            vainqueur=vainqueur,
+            winner_color=winner_color,
+            winner_type=winner_type,
+            winning_cells=winning_cells,
+            message_ia=message_ia
+        )
+
+    # -------------------------------------------------
+    # 4) Récupération simple de la grille courante
+    # -------------------------------------------------
+    elif action == "get_grid":
+        return construire_reponse(logic, historique, status="ok")
+
+    # -------------------------------------------------
+    # 5) Action inconnue
+    # -------------------------------------------------
+    return construire_reponse(logic, historique, status="error")
 
 @app.route("/ai_status", methods=["POST"])
 def ai_status():
