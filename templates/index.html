@@ -77,27 +77,20 @@
 
     <div id="menu">
         <h2>Configuration du Match</h2>
-        <div class="menu-group">
-            <label>Mode de Jeu</label>
-            <select id="select-mode">
-                <option value="pvia">🔴・Joueur VS IA・🟡</option>
-            </select>
-        </div>
         <div id="ia-settings">
             <div class="menu-group" id="starter-group">
                 <label>Qui commence ?</label>
                 <select id="select-starter">
-                    <option value="human">👤 Vous commencez (Rouges)</option>
-                    <option value="ia">🤖 L'IA commence (Rouges)</option>
+                    <option value="human">👤 VOUS COMMENCEZ</option>
+                    <option value="ia">🤖 L'IA COMMENCE</option>
                 </select>
             </div>
         </div>
         
         <button id="btn-start-game" class="btn" onclick="startGame()">NOUVELLE PARTIE</button>
-        <button class="btn" style="background-color: #8e44ad; margin-top: 15px;" onclick="enterPaintMode()">🎨 MODE PEINTURE</button>
 
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(233, 69, 96, 0.3);">
-            <h3 style="color: #a0a0a0; font-size: 1em; margin-bottom: 15px; text-transform: uppercase;">Benoît TRUONG & Vesagatheepan SIVARAJAH</h3>
+            <h3 style="color: #fa3232; font-size: 1em; margin-bottom: 15px; text-transform: uppercase;">Benoît TRUONG & Vesagatheepan SIVARAJAH</h3>
             <div class="menu-group">
                 <label>1. Séquence texte (ex: 44455)</label>
                 <input type="text" id="import-string" placeholder="Saisir les colonnes">
@@ -158,6 +151,14 @@
                     <option value="ia">IA</option>
                 </select>
             </div>
+
+            <div style="background: #0d0d16; padding: 5px 15px; border-radius: 5px; border: 1px solid #555; display: flex; gap: 10px; align-items: center;">
+                <span style="color:#a0a0a0; font-weight:bold;">⏱️ Temps max IA :</span>
+                <input type="number" id="ia-time-limit" value="14" min="1" max="120" style="width: 50px; padding: 5px; background: #1f1f2e; color: white; border: 1px solid #e94560; border-radius: 3px; outline: none; text-align: center;">
+                <span style="color:#a0a0a0; font-weight:bold;">s</span>
+            </div>
+
+
                 <div class="menu-group" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
                 <button class="btn" style="padding: 10px; width: auto; background-color: #d83939; color: rgb(255, 255, 255);" onclick="undoMove()">↩️ Annuler</button>
                 <button class="btn" style="padding: 10px; width: auto; background-color: #ffb327; color: rgb(255, 255, 255);" onclick="resetGame()">🔄 Recommencer</button>
@@ -173,7 +174,9 @@
 
         <div id="status">Préparation de la grille...</div>
         <div id="ia-msg"></div>
-        <div id="progress-container"><div id="progress-bar"></div></div>
+        <div id="ia-progress-container" style="display: none; width: 100%; max-width: 400px; margin: 10px auto; background-color: #1a1a2e; border: 1px solid #00ff88; border-radius: 10px; height: 15px; overflow: hidden; box-shadow: 0 0 5px rgba(0, 255, 136, 0.3);">
+        <div id="ia-progress-bar" style="width: 0%; height: 100%; background-color: #00ff88; transition: width 0.4s ease-out; box-shadow: 0 0 10px #00ff88;"></div>
+        </div>
         
         <div class="board neon-rouge" id="board" data-hover="rouge"></div>
     </div>
@@ -190,7 +193,7 @@
         let previousGrille = null;
         let customBoardActive = false;
         let winningCells = [];
-
+        let aiStatusInterval = null;
         let timeRed = 600, timeYellow = 600;
         let timerInterval;
         let aiPollingInterval;
@@ -203,23 +206,30 @@
             else board.classList.add('neon-neutre');
         }
 
-        function checkNextTurn() {
+        async function checkNextTurn() {
             if (jeuTermine) return;
-            let currentType = (currentColorTurn === 'rouge') ? document.getElementById('live-red-type').value : document.getElementById('live-yellow-type').value;
+
+            let currentType = (currentColorTurn === 'rouge')
+                ? document.getElementById('live-red-type').value
+                : document.getElementById('live-yellow-type').value;
 
             if (currentType === 'ia') {
-                document.getElementById('status').innerText = "L'IA (" + (currentColorTurn === 'rouge' ? 'Rouge' : 'Jaune') + ") analyse...";
+                document.getElementById('status').innerText =
+                    "L'IA (" + (currentColorTurn === 'rouge' ? 'Rouge' : 'Jaune') + ") analyse...";
                 document.getElementById('board').setAttribute('data-hover', 'none');
                 setBoardNeon(currentColorTurn);
+
                 if (!isAiThinking) {
-                    setTimeout(() => { declencherIA(); }, 100);
+                    await declencherIA();
                 }
-            } else {
-                document.getElementById('status').innerText = "À vous de jouer (" + (currentColorTurn === 'rouge' ? 'Rouge' : 'Jaune') + ") !";
-                document.getElementById('board').setAttribute('data-hover', currentColorTurn);
-                setBoardNeon(currentColorTurn);
-                jeuTermine = false;
+                return;
             }
+
+            document.getElementById('status').innerText =
+                "À vous de jouer (" + (currentColorTurn === 'rouge' ? 'Rouge' : 'Jaune') + ") !";
+            document.getElementById('board').setAttribute('data-hover', currentColorTurn);
+            setBoardNeon(currentColorTurn);
+            jeuTermine = false;
         }
 
         function onTypeChange() {
@@ -342,12 +352,15 @@
             
             const nextTurnColor = document.getElementById('paint-next-turn').value;
             const colorInt = (nextTurnColor === 'rouge') ? 1 : 2;
+            let timeLimitElement = document.getElementById('ia-time-limit');
+            let maxTimeSec = timeLimitElement ? parseFloat(timeLimitElement.value) : 14;
             
             startProgressBar();
             
             const res = await fetch('/play', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'analyze', color: colorInt, tab_id: TAB_ID })
+                // ON ENVOIE LE BUDGET TEMPS AU SERVEUR ICI AUSSI :
+                body: JSON.stringify({ action: 'analyze', color: colorInt, tab_id: TAB_ID, budget: maxTimeSec })
             });
             const data = await res.json();
             
@@ -388,30 +401,68 @@
             }
         }
 
+        let isPollingActive = false; //verrou de sécurité
+
         function startProgressBar() {
-            document.getElementById('progress-container').style.display = 'block';
-            document.getElementById('progress-bar').style.width = '0%';
+            isPollingActive = true;
+
+            const progressContainer = document.getElementById('ia-progress-container');
+            const progressBar = document.getElementById('ia-progress-bar');
+
+            if (!progressContainer || !progressBar) return;
+
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+
             let startTime = Date.now();
-            
+            let currentDepth = 1;
+
+            let timeLimitElement = document.getElementById('ia-time-limit');
+            let maxTimeMs = (timeLimitElement ? parseFloat(timeLimitElement.value) : 14) * 1000;
+
+            document.getElementById('ia-msg').innerText = "Analyse en cours... Profondeur : 1 / 17";
+            document.getElementById('ia-msg').style.color = "#00ff88";
+
             aiPollingInterval = setInterval(async () => {
+                if (!isPollingActive) return;
+
                 let elapsed = Date.now() - startTime;
-                let percent = Math.min((elapsed / 14000) * 100, 100);
-                document.getElementById('progress-bar').style.width = percent + '%';
-                
+
                 try {
-                    let res = await fetch('/status_ia');
+                    let res = await fetch('/ai_status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tab_id: TAB_ID })
+                    });
                     let data = await res.json();
-                    if(data.profondeur > 0 && document.getElementById('ia-msg').innerText === "") {
-                        document.getElementById('ia-msg').innerText = "🤖 Profondeur explorée : " + data.profondeur + " ...";
+
+                    if (isPollingActive && data && data.depth > 0) {
+                        currentDepth = data.depth;
+                        document.getElementById('ia-msg').innerText =
+                            "Analyse en cours... Profondeur : " + currentDepth + " / 17";
                     }
-                } catch(e) {}
-            }, 400); 
+                } catch (e) {}
+
+                if (isPollingActive) {
+                    let timePercent = (elapsed / maxTimeMs) * 100;
+                    let depthPercent = (currentDepth / 17) * 100;
+                    let totalPercent = Math.min((timePercent * 0.7) + (depthPercent * 0.3), 100);
+                    progressBar.style.width = totalPercent + '%';
+                }
+            }, 400);
         }
 
         function stopProgressBar() {
+            isPollingActive = false;
             clearInterval(aiPollingInterval);
-            document.getElementById('progress-bar').style.width = '100%';
-            setTimeout(() => { document.getElementById('progress-container').style.display = 'none'; }, 400);
+
+            const progressContainer = document.getElementById('ia-progress-container');
+            const progressBar = document.getElementById('ia-progress-bar');
+
+            if (progressBar) progressBar.style.width = '100%';
+            setTimeout(() => {
+                if (progressContainer) progressContainer.style.display = 'none';
+            }, 400);
         }
 
         async function importGame() {
@@ -515,15 +566,17 @@
             startProgressBar(); 
             
             const colorInt = (currentColorTurn === 'rouge') ? 1 : 2;
+            let timeLimitElement = document.getElementById('ia-time-limit');
+            let maxTimeSec = timeLimitElement ? parseFloat(timeLimitElement.value) : 14;
             
             const res = await fetch('/play', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'ia', color: colorInt, tab_id: TAB_ID }) 
+                // ON ENVOIE LE BUDGET TEMPS AU SERVEUR ICI :
+                body: JSON.stringify({ action: 'ia', color: colorInt, tab_id: TAB_ID, budget: maxTimeSec }) 
             });
             const iaData = await res.json();
             
             stopProgressBar();
-            // 🔥 CORRECTION ICI : iaData.winning_cells
             drawBoard(iaData.grille, iaData.winning_cells || []); 
 
             if (iaData.message_ia) {
