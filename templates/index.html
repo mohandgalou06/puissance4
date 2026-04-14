@@ -147,21 +147,28 @@
 
         <div id="live-controls">
             <div style="background: #0d0d16; padding: 5px 15px; border-radius: 5px; border: 1px solid #555; display: flex; gap: 10px; align-items: center;">
-                <span style="color:#e94560; font-weight:bold;">🔴 Rouge :</span>
+                <span style="color:#e94560; font-weight:bold;">🔴 Rouge:</span>
                 <select id="live-red-type" onchange="onTypeChange()" style="background: #1f1f2e; color: white; border: none; padding: 5px; border-radius: 3px; outline: none; cursor:pointer;">
                     <option value="human">Humain</option>
                     <option value="ia">IA</option>
                 </select>
-                <span style="color:#f9a826; font-weight:bold; margin-left:10px;">🟡 Jaune :</span>
+                <span style="color:#f9a826; font-weight:bold; margin-left:10px;">🟡 Jaune:</span>
                 <select id="live-yellow-type" onchange="onTypeChange()" style="background: #1f1f2e; color: white; border: none; padding: 5px; border-radius: 3px; outline: none; cursor:pointer;">
                     <option value="human">Humain</option>
                     <option value="ia">IA</option>
                 </select>
             </div>
-
-            <button class="btn" style="padding: 10px; width: auto; background-color: #d9534f;" onclick="undoMove()">↩️ Annuler</button>
-            <button class="btn" style="padding: 10px; width: auto; background-color: #f9a826; color: black;" onclick="location.reload()">🔄 Recommencer</button>
-            <button class="btn" style="padding: 10px; width: auto; background-color: #555; margin-left: auto;" onclick="location.reload()">🚪 Quitter</button>
+                <div class="menu-group" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
+                <button class="btn" style="padding: 10px; width: auto; background-color: #d83939; color: rgb(255, 255, 255);" onclick="undoMove()">↩️ Annuler</button>
+                <button class="btn" style="padding: 10px; width: auto; background-color: #ffb327; color: rgb(255, 255, 255);" onclick="resetGame()">🔄 Recommencer</button>
+                
+                <button id="btn-paint-toggle" class="btn" style="padding: 10px; width: auto; background-color: #7d06cc; color: white;" onclick="togglePaintMode()">🖌️ Mode Peinture</button>
+    
+                <div id="paint-tools" style="display: none; gap: 10px; align-items: center;">
+                    <button id="btn-eraser" class="btn" style="padding: 10px; width: auto; background-color: #4a4a4a; color: white; border: 2px solid transparent;" onclick="toggleEraser()">⚫ Gomme</button>
+                    <button class="btn" style="padding: 10px; width: auto; background-color: #4CAF50; color: white; font-weight: bold;" onclick="validatePaint()">✅ Valider</button>
+                </div>
+            </div>
         </div>
 
         <div id="status">Préparation de la grille...</div>
@@ -256,8 +263,8 @@
             return null;
         }
 
-        // 🔥 CORRECTION ICI : la variable s'appelle `winning_cells` depuis le serveur Python
         function drawBoard(grille, winCells = []) {
+            currentGrille = grille;
             const boardDiv = document.getElementById('board');
             boardDiv.innerHTML = '';
             winningCells = Array.isArray(winCells) ? winCells : [];
@@ -274,9 +281,17 @@
                         if (lastMove && lastMove.l === l && lastMove.c === c && !paintMode) cell.classList.add('last-move');
                         if (winningSet.has(`${l},${c}`)) cell.classList.add('winning-cell');
                     }
-                    cell.onclick = () => { 
-                        if (paintMode && !isAiThinking) paintCell(l, c); 
-                        else if (grille[l][c] === 0 && !paintMode) playMove(c); 
+                    cell.oncontextmenu = (e) => {
+                        e.preventDefault(); // Empêche le menu classique du navigateur de s'ouvrir
+                        if (paintMode && !isAiThinking) handlePaintClick(l, c, 2); // 2 = Clic droit
+                    };
+
+                    cell.onclick = () => {
+                        if (paintMode && !isAiThinking) {
+                            handlePaintClick(l, c, 1); // 1 = Clic gauche
+                        } else if (grille[l][c] === 0 && !paintMode) {
+                            playMove(c);
+                        }
                     };
                     boardDiv.appendChild(cell);
                 }
@@ -565,6 +580,120 @@
             switchTimer(currentColorTurn); 
             checkNextTurn(); 
         }
+
+
+    async function resetGame() {
+    // On appelle la route /reset de app.py avec l'ID de l'onglet pour l'isolation
+    const res = await fetch('/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tab_id: TAB_ID }) 
+    });
+    const data = await res.json();
+    
+    // On réinitialise les variables locales
+    jeuTermine = false;
+    isAiThinking = false;
+    currentColorTurn = 'rouge'; // On remet le rouge par défaut
+    
+    // On redessine la grille vide (reçue du serveur)
+    drawBoard(data.grille, []);
+    
+    // On remet à jour l'affichage des textes
+    document.getElementById('status').innerText = "À vous de jouer !";
+    document.getElementById('status').style.color = "#ffffff";
+    document.getElementById('ia-msg').innerText = "";
+    
+    // On cache l'éventuel message de victoire
+    const overlay = document.getElementById('win-overlay');
+    if(overlay) overlay.style.display = 'none';
+    }
+    // Variable d'état pour la peinture
+
+let eraserMode = false;
+let currentGrille = []; // Stocke la grille en temps réel
+
+function togglePaintMode() {
+    paintMode = true;
+    document.getElementById('btn-paint-toggle').style.display = "none";
+    document.getElementById('paint-tools').style.display = "flex";
+    
+    // Le texte s'affiche ici à la place du "À vous de jouer" !
+    document.getElementById('status').innerHTML = "<span style='color: #e94560; font-weight: bold;'>CLIC GAUCHE = ROUGE</span> &nbsp;|&nbsp; <span style='color: #f9a826; font-weight: bold;'>CLIC DROIT = JAUNE</span>";
+}
+
+function toggleEraser() {
+    eraserMode = !eraserMode;
+    const btn = document.getElementById('btn-eraser');
+    if (eraserMode) {
+        btn.style.backgroundColor = "#ff4c4c"; // Devient rouge vif
+        btn.innerText = "⚫ Gomme (Active)";
+    } else {
+        btn.style.backgroundColor = "#4a4a4a"; // Redevient gris
+        btn.innerText = "⚫ Gomme";
+    }
+}
+
+async function validatePaint() {
+    paintMode = false;
+    eraserMode = false;
+    
+    // Réinitialise l'interface
+    document.getElementById('btn-paint-toggle').style.display = "block"; 
+    document.getElementById('paint-tools').style.display = "none"; 
+    document.getElementById('btn-eraser').innerText = "🧽 Gomme: OFF";
+    document.getElementById('btn-eraser').style.backgroundColor = "#ffffff";
+    
+    // Comptage des pions pour définir à qui le tour
+    let countRed = 0;
+    let countYellow = 0;
+    
+    for (let r = 0; r < currentGrille.length; r++) {
+        for (let c = 0; c < currentGrille[r].length; c++) {
+            if (currentGrille[r][c] === 1) countRed++;
+            if (currentGrille[r][c] === 2) countYellow++;
+        }
+    }
+    
+    // Si Rouge a plus de jetons, c'est au tour de Jaune, sinon Rouge joue
+    if (countRed > countYellow) {
+        currentColorTurn = 'jaune';
+    } else {
+        currentColorTurn = 'rouge';
+    }
+    
+    switchTimer(currentColorTurn);
+    document.getElementById('status').innerText = "Grille validée ! À " + (currentColorTurn === 'rouge' ? "Rouge" : "Jaune") + " de jouer.";
+    document.getElementById('status').style.color = currentColorTurn === 'rouge' ? "#e94560" : "#f9a826";
+    
+    checkNextTurn(); // Si jamais le tour validé tombe sur une IA !
+}
+
+async function handlePaintClick(row, col, clickType) {
+    let cellValue = currentGrille[row][col];
+    let newColor = 0;
+
+    if (eraserMode) {
+        newColor = 0;
+    } else {
+        if (clickType === 1) { // Clic Gauche (Rouge)
+            if (cellValue === 1) newColor = 0; 
+            else newColor = 1; 
+        } else if (clickType === 2) { // Clic Droit (Jaune)
+            if (cellValue === 2) newColor = 0; 
+            else newColor = 2; 
+        }
+    }
+
+    // Envoi de la case modifiée au serveur
+    const res = await fetch('/paint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tab_id: TAB_ID, row: row, col: col, color: newColor })
+    });
+    const data = await res.json();
+    drawBoard(data.grille, []);
+}
     </script>
 </body>
 </html>
