@@ -1,7 +1,7 @@
 import os
 import json
 from flask import Flask, jsonify, render_template, request
-
+from database import Database
 from ai import IA_Tournoi
 from constants import JAUNE, ROUGE, SAVE_DIR
 from game_logic import GameLogic
@@ -10,6 +10,7 @@ BOARD_SIZE = 9
 
 app = Flask(__name__)
 app.secret_key = "clef_secrete_super_puissance4_bga"
+db_site = Database()
 
 # Fonctions utilitaires pour la structure des données
 def grille_vide():
@@ -50,11 +51,22 @@ def sauvegarder_partie(tab_id, logic, historique):
             "historique": historique
         }, f)
 
+def sauvegarder_en_bdd_si_finie(vainqueur, historique):
+    if not vainqueur or not historique:
+        return False, "Partie non terminee."
+
+    return db_site.sauvegarder(
+        vainqueur,
+        historique,
+        confiance=3,
+        nb_colonnes=BOARD_SIZE
+    )
+
 def prochain_joueur(historique):
     """Détermine qui doit jouer selon l'historique des coups."""
     return JAUNE if len(historique) % 2 != 0 else ROUGE
 
-def construire_reponse(logic, historique, vainqueur=None, winner_color=None, winner_type=None, winning_cells=None, message_ia="", status="ok"):
+def construire_reponse(logic, historique, vainqueur=None, winner_color=None, winner_type=None, winning_cells=None, message_ia="", status="ok",best_move=None):
     """Prépare le dictionnaire JSON de réponse pour le client."""
     return jsonify({
         "status": status,
@@ -65,7 +77,8 @@ def construire_reponse(logic, historique, vainqueur=None, winner_color=None, win
         "winner_type": winner_type,
         "winning_cells": winning_cells,
         "message_ia": message_ia,
-        "au_tour_de": prochain_joueur(historique)
+        "au_tour_de": prochain_joueur(historique),
+        "best_move": best_move
     })
 
 # --- ROUTES FLASK ---
@@ -171,6 +184,9 @@ def play():
         elif logic.grille_pleine():
             vainqueur = "Nul"
             winner_type = "draw"
+        if vainqueur:
+            ok_bdd, msg_bdd = sauvegarder_en_bdd_si_finie(vainqueur, historique)
+            print(f"[BDD SITE] {ok_bdd} - {msg_bdd}")
 
         sauvegarder_partie(tab_id, logic, historique)
         return construire_reponse(
@@ -192,13 +208,14 @@ def play():
         ia_terminator.budget_secondes = budget_client
         ia_terminator.max_profondeur = 25
 
-        _, _score = ia_terminator.analyser_position(logic, joueur_actuel, tab_id=tab_id)
+        best_move = ia_terminator.jouer_coup(logic, historique, joueur_actuel, tab_id=tab_id)
         message_ia = getattr(ia_terminator, "dernier_message", "")
 
         return construire_reponse(
             logic, historique,
             message_ia=message_ia,
-            status="ok"
+            status="ok",
+            best_move=best_move
         )
 
     # -------------------------------------------------
@@ -228,6 +245,9 @@ def play():
         elif logic.grille_pleine():
             vainqueur = "Nul"
             winner_type = "draw"
+        if vainqueur:
+            ok_bdd, msg_bdd = sauvegarder_en_bdd_si_finie(vainqueur, historique)
+            print(f"[BDD SITE] {ok_bdd} - {msg_bdd}")
 
         sauvegarder_partie(tab_id, logic, historique)
         return construire_reponse(
