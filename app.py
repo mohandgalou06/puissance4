@@ -286,5 +286,45 @@ def ai_status():
     
     return jsonify({"depth": 0})
 
+@app.route("/save_game", methods=["POST"])
+def save_game():
+    data = request.get_json(silent=True) or {}
+    tab_id = data.get("tab_id", "default")
+
+    logic, historique = charger_partie(tab_id)
+
+    if not historique:
+        return jsonify({
+            "status": "error",
+            "message": "Aucune partie à enregistrer."
+        })
+
+    if logic.victoire(ROUGE):
+        vainqueur = "Rouge"
+    elif logic.victoire(JAUNE):
+        vainqueur = "Jaune"
+    elif logic.grille_pleine():
+        vainqueur = "Nul"
+    else:
+        vainqueur = "En cours"
+
+    ok, msg = db_site.sauvegarder(
+        vainqueur,
+        historique,
+        confiance=3,
+        nb_colonnes=BOARD_SIZE
+    )
+
+    if ok:
+        return jsonify({
+            "status": "ok",
+            "message": f"Partie enregistrée en BDD (ID={msg})."
+        })
+
+    return jsonify({
+        "status": "error",
+        "message": str(msg)
+    })
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
