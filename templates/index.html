@@ -55,7 +55,11 @@
             50% { transform: scale(1.08); opacity: 1; box-shadow: 0 0 16px rgba(0, 255, 136, 1), 0 0 32px rgba(0, 255, 136, 0.9); }
         }
         
-        .col-number { width: 55px; height: 25px; line-height: 25px; text-align: center; font-weight: bold; color: #7a7a8c; font-size: 0.9em; cursor: default; }
+        .col-number.best-human-move {
+            color: #00ff88;
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.9), 0 0 16px rgba(0, 255, 136, 0.6);
+            transform: scale(1.08);
+        }
         #progress-container { width: 400px; background-color: #2a2a35; border-radius: 20px; margin: 0 auto 20px auto; height: 20px; display: none; overflow: hidden;}
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #f9a826, #ffcc70); transition: width 0.3s linear;}
         
@@ -198,6 +202,9 @@
         let timeRed = 600, timeYellow = 600;
         let timerInterval;
         let aiPollingInterval;
+        let currentGrille = null;
+        let bestHumanMove = null;
+        let lastMoveMarker = null;
 
         function setBoardNeon(color) {
             const board = document.getElementById('board');
@@ -220,6 +227,9 @@
                 document.getElementById('board').setAttribute('data-hover', 'none');
                 setBoardNeon(currentColorTurn);
 
+                bestHumanMove = null;
+                drawBoard(currentGrille, winningCells || []);
+
                 if (!isAiThinking) {
                     await declencherIA();
                 }
@@ -231,6 +241,7 @@
             document.getElementById('board').setAttribute('data-hover', currentColorTurn);
             setBoardNeon(currentColorTurn);
             jeuTermine = false;
+            updateBestHumanHint();
         }
 
         function onTypeChange() {
@@ -279,7 +290,13 @@
             const boardDiv = document.getElementById('board');
             boardDiv.innerHTML = '';
             winningCells = Array.isArray(winCells) ? winCells : [];
-            const lastMove = findLastMove(previousGrille, grille);
+
+            const detectedLastMove = findLastMove(previousGrille, grille);
+            if (detectedLastMove) {
+                lastMoveMarker = detectedLastMove;
+            }
+
+            const lastMove = lastMoveMarker;
             const winningSet = new Set(winningCells.map(([l, c]) => `${l},${c}`));
 
             for (let l = 0; l < lignes; l++) {
@@ -310,6 +327,11 @@
             for (let c = 0; c < colonnes; c++) {
                 const num = document.createElement('div');
                 num.classList.add('col-number');
+
+                if (bestHumanMove === c) {
+                    num.classList.add('best-human-move');
+                }
+
                 num.innerText = c + 1;
                 boardDiv.appendChild(num);
             }
@@ -332,6 +354,7 @@
             customBoardActive = true;
             previousGrille = null; 
             await fetch('/reset', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({tab_id: TAB_ID}) }); 
+            lastMoveMarker = null;
             drawBoard(Array(9).fill().map(()=>Array(9).fill(0)), []); 
         }
 
@@ -374,6 +397,8 @@
                     document.getElementById('ia-msg').style.color = "#e94560"; 
                 }
             }
+            bestHumanMove = Number.isInteger(data.best_move) ? data.best_move : null;
+            drawBoard(currentGrille, winningCells || []);
         }
 
         function exitPaintMode() {
@@ -396,6 +421,7 @@
             const data = await res.json();
             if(data.grille) {
                 // 🔥 CORRECTION ICI : data.winning_cells
+                lastMoveMarker = null;
                 drawBoard(data.grille, data.winning_cells || []);
                 document.getElementById('ia-msg').innerText = "Coup(s) annulé(s).";
                 checkNextTurn(); 
@@ -649,6 +675,8 @@
     jeuTermine = false;
     isAiThinking = false;
     currentColorTurn = 'rouge'; // On remet le rouge par défaut
+    lastMoveMarker = null;
+    bestHumanMove = null;
     
     // On redessine la grille vide (reçue du serveur)
     drawBoard(data.grille, []);
@@ -665,7 +693,6 @@
     // Variable d'état pour la peinture
 
 let eraserMode = false;
-let currentGrille = []; // Stocke la grille en temps réel
 
 function togglePaintMode() {
     paintMode = true;
@@ -747,6 +774,42 @@ async function handlePaintClick(row, col, clickType) {
     });
     const data = await res.json();
     drawBoard(data.grille, []);
+}
+
+async function updateBestHumanHint() {
+    if (jeuTermine || isAiThinking || paintMode || !currentGrille) return;
+
+    const currentType = (currentColorTurn === 'rouge')
+        ? document.getElementById('live-red-type').value
+        : document.getElementById('live-yellow-type').value;
+
+    if (currentType !== 'human') {
+        bestHumanMove = null;
+        drawBoard(currentGrille, winningCells || []);
+        return;
+    }
+
+    const colorInt = (currentColorTurn === 'rouge') ? 1 : 2;
+
+    try {
+        const res = await fetch('/play', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'analyze',
+                color: colorInt,
+                tab_id: TAB_ID,
+                budget: 1.0
+            })
+        });
+
+        const data = await res.json();
+        bestHumanMove = Number.isInteger(data.best_move) ? data.best_move : null;
+        drawBoard(currentGrille, winningCells || []);
+    } catch (e) {
+        bestHumanMove = null;
+        drawBoard(currentGrille, winningCells || []);
+    }
 }
     </script>
 </body>
