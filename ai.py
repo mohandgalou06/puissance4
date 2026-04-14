@@ -113,8 +113,51 @@ class IA_Tournoi:
                 logic.grille[l][c] = 0
 
         return None
+    
+    def coup_bdd_est_sain(self, logic, joueur_ia, coup_bdd, profondeur_test=4, budget_test=0.20):
+        if coup_bdd is None or not logic.colonne_valide(coup_bdd):
+            return False
 
-    def jouer_coup(self, logic, coups_joues, joueur_ia):
+        adversaire = JAUNE if joueur_ia == ROUGE else ROUGE
+        l = logic.placer_pion(coup_bdd, joueur_ia)
+
+        try:
+            # Si le coup BDD gagne immédiatement, on le garde.
+            if logic.victoire(joueur_ia):
+                return True
+
+            # Sécurité 1 : refuser si l'adversaire peut gagner immédiatement derrière.
+            for c in range(9):
+                if logic.colonne_valide(c):
+                    l2 = logic.placer_pion(c, adversaire)
+                    gagne = logic.victoire(adversaire)
+                    logic.grille[l2][c] = 0
+                    if gagne:
+                        return False
+
+            # Sécurité 2 : mini-vérification tactique avec le moteur.
+            # Important : tab_id=None pour ne pas polluer la barre de progression.
+            _, score_test = minimax_iteratif(
+                logic,
+                est_maximisant=(adversaire == JAUNE),
+                max_profondeur=profondeur_test,
+                budget_secondes=budget_test,
+                tab_id=None
+            )
+
+            if score_test is None:
+                return True
+
+            # score > 0 avantage JAUNE ; score < 0 avantage ROUGE
+            if joueur_ia == JAUNE:
+                return score_test > -35_000
+            else:
+                return score_test < 35_000
+
+        finally:
+            logic.grille[l][coup_bdd] = 0
+
+    def jouer_coup(self, logic, coups_joues, joueur_ia, tab_id=None):
         nom_joueur = "Rouge" if joueur_ia == ROUGE else "Jaune"
         print(f"\n[IA Terminator] Reflexion pour {nom_joueur}...", flush=True)
 
@@ -141,15 +184,19 @@ class IA_Tournoi:
         if len(coups_joues) == nb_pions:
             coup_bdd = self.chercher_dans_bdd(coups_joues, joueur_ia)
             if coup_bdd is not None and logic.colonne_valide(coup_bdd):
-                self.memoriser_coup(logic, joueur_ia, coup_bdd)
-                self.dernier_message = "Base de donnees: coup theorique retrouve."
-                return coup_bdd
+                if self.coup_bdd_est_sain(logic, joueur_ia, coup_bdd):
+                    self.memoriser_coup(logic, joueur_ia, coup_bdd)
+                    self.dernier_message = "Base de donnees: coup theorique valide."
+                    return coup_bdd
+                else:
+                    self.dernier_message = "Base de donnees rejetee: coup tactiquement dangereux."
 
         colonne, score = minimax_iteratif(
             logic,
             est_maximisant=(joueur_ia == JAUNE),
             max_profondeur=self.max_profondeur,
             budget_secondes=self.budget_secondes,
+            tab_id=tab_id
         )
 
         prof_atteinte = generateur_tournoi.LAST_COMPLETED_DEPTH
