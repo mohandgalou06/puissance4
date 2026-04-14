@@ -1,3 +1,4 @@
+import os
 import json
 import time
 from datetime import datetime
@@ -17,10 +18,11 @@ from constants import COLONNES
 class Database:
     def __init__(self):
         self.config = {
-            "host": "localhost",
-            "user": "root",
-            "password": "",
-            "database": "puissance4",
+            "host": os.getenv("DB_HOST", "localhost"),
+            "user": os.getenv("DB_USER", "root"),
+            "password": os.getenv("DB_PASSWORD", ""),
+            "database": os.getenv("DB_NAME", "puissance4"),
+            "port": int(os.getenv("DB_PORT", "3306")),
         }
         self.conn = None
         self.delai_reconnexion = 10.0
