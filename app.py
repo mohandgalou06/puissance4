@@ -3,7 +3,7 @@ import json
 from flask import Flask, jsonify, render_template, request
 from database import Database
 from ai import IA_Tournoi
-from constants import JAUNE, ROUGE, SAVE_DIR
+from constants import JAUNE, ROUGE, SAVE_DIR, COULEUR_DEPART
 from game_logic import GameLogic
 
 BOARD_SIZE = 9
@@ -62,9 +62,34 @@ def sauvegarder_en_bdd_si_finie(vainqueur, historique):
         nb_colonnes=BOARD_SIZE
     )
 
-def prochain_joueur(historique):
-    """Détermine qui doit jouer selon l'historique des coups."""
-    return JAUNE if len(historique) % 2 != 0 else ROUGE
+def prochain_joueur(logic, historique=None):
+    """Détermine qui doit jouer.
+    - Si la grille correspond à une alternance normale, on déduit le tour depuis les pions.
+    - Sinon, on peut fallback sur l'historique ou la couleur de départ.
+    """
+    nb_rouges = sum(cell == ROUGE for ligne in logic.grille for cell in ligne)
+    nb_jaunes = sum(cell == JAUNE for ligne in logic.grille for cell in ligne)
+
+    #on déduit le tour depuis le nombre de pions
+    if COULEUR_DEPART == ROUGE:
+        if nb_rouges == nb_jaunes:
+            return ROUGE
+        if nb_rouges == nb_jaunes + 1:
+            return JAUNE
+    else:
+        if nb_jaunes == nb_rouges:
+            return JAUNE
+        if nb_jaunes == nb_rouges + 1:
+            return ROUGE
+
+    #fallback si la position peinte est "bizarre" ou incohérente
+    if historique is not None:
+        if COULEUR_DEPART == ROUGE:
+            return JAUNE if len(historique) % 2 != 0 else ROUGE
+        else:
+            return ROUGE if len(historique) % 2 != 0 else JAUNE
+
+    return COULEUR_DEPART
 
 def construire_reponse(logic, historique, vainqueur=None, winner_color=None, winner_type=None, winning_cells=None, message_ia="", status="ok",best_move=None):
     """Prépare le dictionnaire JSON de réponse pour le client."""
@@ -77,7 +102,7 @@ def construire_reponse(logic, historique, vainqueur=None, winner_color=None, win
         "winner_type": winner_type,
         "winning_cells": winning_cells,
         "message_ia": message_ia,
-        "au_tour_de": prochain_joueur(historique),
+        "au_tour_de": prochain_joueur(logic, historique),
         "best_move": best_move
     })
 
@@ -107,14 +132,10 @@ def undo():
     
     logic, historique = charger_partie(tab_id)
     if historique:
-        historique.pop()
-        # On reconstruit la grille à partir de l'historique restant
-        nouvelle_grille = grille_vide()
-        temp_logic = GameLogic()
-        temp_logic.grille = nouvelle_grille
-        for l, c, j in historique:
-            temp_logic.grille[l][c] = j
-        logic.grille = temp_logic.grille
+        # On récupère les infos du dernier coup et on l'enlève de l'historique
+        l, c, j = historique.pop()
+        logic.grille[l][c] = 0
+        
         sauvegarder_partie(tab_id, logic, historique)
         
     return construire_reponse(logic, historique)
@@ -150,7 +171,7 @@ def play():
     except (TypeError, ValueError):
         couleur_forcee = None
 
-    joueur_actuel = prochain_joueur(historique)
+    joueur_actuel = prochain_joueur(logic, historique)
 
     # En mode analyse, on respecte la couleur choisie côté front si elle est fournie
     if action == "analyze" and couleur_forcee in (ROUGE, JAUNE):
@@ -208,7 +229,11 @@ def play():
         ia_terminator.budget_secondes = budget_client
         ia_terminator.max_profondeur = 25
 
-        best_move = ia_terminator.jouer_coup(logic, historique, joueur_actuel, tab_id=tab_id)
+        best_move, _score = ia_terminator.analyser_position(
+            logic,
+            joueur_actuel,
+            tab_id=tab_id
+        )
         message_ia = getattr(ia_terminator, "dernier_message", "")
 
         return construire_reponse(
