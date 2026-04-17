@@ -165,10 +165,12 @@ def penalite_case_offerte(grille, col, joueur, ligne_posee):
     if grille[ligne_dessus][col] != 0:
         return 0
 
-    if victoire_apres_coup(grille, ligne_dessus, col, adversaire):
-        return -60_000
+    if not victoire_apres_coup(grille, ligne_dessus, col, adversaire):
+        return 0
 
-    return 0
+    # Convention du score minimax : '+' favorise JAUNE, '-' favorise ROUGE.
+    # Offrir une case gagnante a l'adversaire doit TOUJOURS penaliser celui qui vient de jouer.
+    return -60_000 if joueur == JAUNE else +60_000
 
 
 # =========================
@@ -389,6 +391,7 @@ def minimax_iteratif(logic, est_maximisant=True, max_profondeur=10, budget_secon
     LAST_COMPLETED_DEPTH = 0
     KILLER_MOVES = {}
     HISTORY_HEURISTIC = [0] * 9
+    CACHE_MINIMAX.clear()
 
     meilleur_coup = None
     meilleur_score = -float("inf") if est_maximisant else float("inf")
