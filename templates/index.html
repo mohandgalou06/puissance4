@@ -158,7 +158,7 @@
 
             <div style="background: #0d0d16; padding: 5px 15px; border-radius: 5px; border: 1px solid #555; display: flex; gap: 10px; align-items: center;">
                 <span style="color:#a0a0a0; font-weight:bold;">⏱️ Temps max IA :</span>
-                <input type="number" id="ia-time-limit" value="14" min="1" max="120" style="width: 50px; padding: 5px; background: #1f1f2e; color: white; border: 1px solid #e94560; border-radius: 3px; outline: none; text-align: center;">
+                <input type="number" id="ia-time-limit" value="5" min="1" max="120" style="width: 50px; padding: 5px; background: #1f1f2e; color: white; border: 1px solid #e94560; border-radius: 3px; outline: none; text-align: center;">
                 <span style="color:#a0a0a0; font-weight:bold;">s</span>
             </div>
 
@@ -167,12 +167,13 @@
                 <button class="btn" style="padding: 10px; width: auto; background-color: #d83939; color: rgb(255, 255, 255);" onclick="undoMove()">↩️ Annuler</button>
                 <button class="btn" style="padding: 10px; width: auto; background-color: #ffb327; color: rgb(255, 255, 255);" onclick="resetGame()">🔄 Recommencer</button>
                 
+                <button class="btn" style="padding: 10px; width: auto; background-color: #3498db; color: white;" onclick="analyzeBoard()">🔍 Analyser</button>
+                
                 <button id="btn-paint-toggle" class="btn" style="padding: 10px; width: auto; background-color: #7d06cc; color: white;" onclick="togglePaintMode()">🖌️ Mode Peinture</button>
                 <button id="btn-save-game" class="btn" style="padding: 10px; width: auto; background-color: #16a085; color: white;" onclick="saveCurrentGame()">💾 Enregistrer DB</button>
                 <button id="btn-export-txt" class="btn" style="padding: 10px; width: auto; background-color: #2980b9; color: white;" onclick="exportGameTxt()">💾 .txt</button>   
                 <div id="paint-tools" style="display: none; gap: 10px; align-items: center;">
                     <button id="btn-eraser" class="btn" style="padding: 10px; width: auto; background-color: #4a4a4a; color: white; border: 2px solid transparent;" onclick="toggleEraser()">⚫ Gomme</button>
-                    <button class="btn" style="padding: 10px; width: auto; background-color: #3498db; color: white; font-weight: bold;" onclick="analyzeBoard()">🔍 Analyser</button>
                     <button class="btn" style="padding: 10px; width: auto; background-color: #4CAF50; color: white; font-weight: bold;" onclick="validatePaint()">✅ Valider</button>
                 </div>
             </div>
@@ -375,8 +376,16 @@
             document.getElementById('ia-msg').innerText = "";
             document.getElementById('ia-msg').style.color = "#00ff88";
             
-            const nextTurnColor = document.getElementById('paint-next-turn').value;
-            const colorInt = (nextTurnColor === 'rouge') ? 1 : 2;
+            let colorInt;
+            if (customBoardActive) {
+                // Mode "Créer un plateau" du menu d'accueil
+                const nextTurnColor = document.getElementById('paint-next-turn').value;
+                colorInt = (nextTurnColor === 'rouge') ? 1 : 2;
+            } else {
+                // En pleine partie
+                colorInt = (currentColorTurn === 'rouge') ? 1 : 2;
+            }
+
             let timeLimitElement = document.getElementById('ia-time-limit');
             let maxTimeSec = timeLimitElement ? parseFloat(timeLimitElement.value) : 14;
             
@@ -384,9 +393,9 @@
             
             const res = await fetch('/play', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                // ON ENVOIE LE BUDGET TEMPS AU SERVEUR ICI AUSSI :
                 body: JSON.stringify({ action: 'analyze', color: colorInt, tab_id: TAB_ID, budget: maxTimeSec })
             });
+            
             const data = await res.json();
             
             stopProgressBar();
@@ -488,8 +497,13 @@
             const progressBar = document.getElementById('ia-progress-bar');
 
             if (progressBar) progressBar.style.width = '100%';
+            
             setTimeout(() => {
-                if (progressContainer) progressContainer.style.display = 'none';
+                // 🔥 LA CORRECTION EST LÀ : on ne cache la barre que si 
+                // une nouvelle analyse n'a pas été relancée entre temps !
+                if (progressContainer && !isPollingActive) {
+                    progressContainer.style.display = 'none';
+                }
             }, 400);
         }
 
@@ -514,9 +528,8 @@
             timeRed = 600; timeYellow = 600; updateTimersDisplay();
             previousGrille = null;
             
-            const starter = document.getElementById('select-starter').value;
-            document.getElementById('live-red-type').value = (starter === 'ia') ? 'ia' : 'human';
-            document.getElementById('live-yellow-type').value = (starter === 'ia') ? 'human' : 'ia';
+            document.getElementById('live-red-type').value = 'human';
+            document.getElementById('live-yellow-type').value = 'human';
 
             document.getElementById('status').innerText = "Importation...";
             await fetch('/reset', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({tab_id: TAB_ID}) });
@@ -723,8 +736,8 @@ async function validatePaint() {
     // Réinitialise l'interface
     document.getElementById('btn-paint-toggle').style.display = "block"; 
     document.getElementById('paint-tools').style.display = "none"; 
-    document.getElementById('btn-eraser').innerText = "🧽 Gomme: OFF";
-    document.getElementById('btn-eraser').style.backgroundColor = "#ffffff";
+    document.getElementById('btn-eraser').innerText = "⚫ Gomme";
+    document.getElementById('btn-eraser').style.backgroundColor = "#4a4a4a";
     
     // Comptage des pions pour définir à qui le tour
     let countRed = 0;
