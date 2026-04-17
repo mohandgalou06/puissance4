@@ -9,7 +9,7 @@ from generateur_tournoi import minimax_iteratif
 class IA_Tournoi:
     def __init__(self):
         self.db = Database()
-        self.budget_secondes = 14.0
+        self.budget_secondes = 5.0
         self.max_profondeur = 20
         self.dernier_message = ""
         self.utiliser_bdd = True
@@ -157,6 +157,16 @@ class IA_Tournoi:
         finally:
             logic.grille[l][coup_bdd] = 0
 
+
+    def _extraire_demi_coups(self, score, prof_atteinte):
+        if score is None or abs(score) < 9_000_000:
+            return None
+
+        reste = max(0, (abs(score) - 10_000_000) // 1000)
+        demi_coups = max(1, prof_atteinte - reste)
+        return int(demi_coups)
+    
+
     def jouer_coup(self, logic, coups_joues, joueur_ia, tab_id=None):
         nom_joueur = "Rouge" if joueur_ia == ROUGE else "Jaune"
         print(f"\n[IA Terminator] Reflexion pour {nom_joueur}...", flush=True)
@@ -228,6 +238,23 @@ class IA_Tournoi:
         self.utiliser_bdd = False
         self.memoire_coups.clear()
 
+        coup_urgent = self.trouver_coup_evident(logic, joueur_ia)
+        if coup_urgent is not None:
+            # On vérifie si ce coup urgent est une attaque ou une défense
+            l = logic.placer_pion(coup_urgent, joueur_ia)
+            est_victoire = logic.victoire(joueur_ia)
+            logic.grille[l][coup_urgent] = 0
+            
+            if est_victoire:
+                self.dernier_message = "Coup critique : Victoire immédiate !"
+                score_artificiel = 10_000_000 if joueur_ia == JAUNE else -10_000_000
+            else:
+                self.dernier_message = "Coup critique : Blocage obligatoire !"
+                score_artificiel = 0 
+            
+            # On retourne immédiatement ce coup vital sans perdre de temps
+            return coup_urgent, score_artificiel
+
         colonne, score = minimax_iteratif(
             logic,
             est_maximisant=(joueur_ia == JAUNE),
@@ -237,17 +264,27 @@ class IA_Tournoi:
         )
 
         prof_atteinte = generateur_tournoi.LAST_COMPLETED_DEPTH
+        infos_mat = self._extraire_infos_mat(score, prof_atteinte)
+        print("DEBUG ANALYSE:", {
+            "score": score,
+            "prof_atteinte": prof_atteinte,
+            "infos_mat": infos_mat,
+            "joueur_ia": joueur_ia
+        }, flush=True)
 
         if score is None:
             self.dernier_message = "Analyse terminee sans resultat exploitable."
-            return colonne, score
-
-        if score > 9_000_000:
-            self.dernier_message = f"Victoire forcee pour Jaune prouvee. Profondeur completee : {prof_atteinte}."
-        elif score < -9_000_000:
-            self.dernier_message = f"Victoire forcee pour Rouge prouvee. Profondeur completee : {prof_atteinte}."
+        elif infos_mat is not None:
+            self.dernier_message = (
+                f"Solution trouvee : {infos_mat['gagnant']} gagne en "
+                f"{infos_mat['demi_coups']} demi-coups "
+                f"(~ {infos_mat['coups']} coup(s)). "
+                f"Profondeur completee : {prof_atteinte}."
+            )
         else:
-            self.dernier_message = f"Aucune victoire forcee prouvee jusqu'a la profondeur {prof_atteinte}."
+            self.dernier_message = (
+                f"Aucune victoire forcee prouvee jusqu'a la profondeur {prof_atteinte}."
+            )
 
         return colonne, score
 
