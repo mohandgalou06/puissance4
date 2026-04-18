@@ -238,6 +238,9 @@ class IA_Tournoi:
         self.utiliser_bdd = False
         self.memoire_coups.clear()
 
+        if self._compter_pions(logic) == 0:
+            return 4, 15
+
         coup_urgent = self.trouver_coup_evident(logic, joueur_ia)
         if coup_urgent is not None:
             # On vérifie si ce coup urgent est une attaque ou une défense
