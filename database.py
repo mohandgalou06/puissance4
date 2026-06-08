@@ -139,8 +139,8 @@ class Database:
             cursor.close()
             return True, last_id
 
-        except mysql_connector.IntegrityError:
-            return False, "Doublon detecte par MySQL (IntegrityError)."
+        except mysql_connector.IntegrityError as e:
+            return False, f"IntegrityError: {e}"
         except Error as e:
             self.conn = None
             return False, f"Erreur SQL: {e}"
@@ -175,3 +175,23 @@ class Database:
             self.conn = None
             print(f"Erreur lecture: {e}")
             return []
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
