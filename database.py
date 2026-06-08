@@ -108,7 +108,7 @@ class Database:
 
         id_existant = self.recuperer_id_par_sequence(sequence)
         if id_existant:
-            return False, f"Doublon ID={id_existant}"
+            return False, f"ID={id_existant}"
 
         id_sym = self.recuperer_id_par_sequence(sym_seq)
 
